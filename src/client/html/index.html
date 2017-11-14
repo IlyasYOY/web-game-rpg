@@ -20,6 +20,25 @@
             vertical-align: top;
         }
 
+        #chat {
+            width: 200px; /* ширина нашего блока */
+            height: 125px; /* высота нашего блока */
+            background: #fff; /* цвет фона, белый */
+            border: 1px solid black; /* размер и цвет границы блока */
+            overflow: auto; /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
+        }
+
+        #inputToChat{
+            width: 200px; /* ширина нашего блока */
+            height: 25px; /* высота нашего блока */
+            background: #fff; /* цвет фона, белый */
+            border: 1px solid black; /* размер и цвет границы блока */
+        }
+
+        input{
+            width: 100%;
+        }
+
     </style>
 </head>
 <body>
@@ -30,7 +49,16 @@
     <div style="float: left;">
         <canvas style="float: left" id="miniMap"></canvas>
         <div style="float: none;">
-            <canvas id="inv"></canvas>
+            <canvas style="float: none" id="inv"></canvas>
+            <form>
+            <div style="float: none;" id="chat">
+                chat
+            </div>
+            <input style="float: none;" id="inputToChat" type="text"/>
+                <div>
+                <input type="submit" />
+                </div>
+            </form>
         </div>
     </div>
 </div>
@@ -94,15 +122,19 @@
     let miniMapHeight = canvasHeight / 3;
     let inventoryWidth = canvasWidth / 3;
     let inventoryHeight = canvasHeight / 3;
+    let chatSize = inventoryHeight;
     let numbersOfCell = 10;
-    var sizeOfCell = canvasHeight / numbersOfCell;
-    var inventory = document.getElementById('inv');
-    var inventoryContext = inventory.getContext('2d');
-    var canvas = document.getElementById('canvas');
-    var canvasContext = canvas.getContext('2d');
-    var miniMap = document.getElementById('miniMap');
-    var miniMapContext = miniMap.getContext('2d');
-
+    let sizeOfCell = canvasHeight / numbersOfCell;
+    let inventory = document.getElementById('inv');
+    let inventoryContext = inventory.getContext('2d');
+    let canvas = document.getElementById('canvas');
+    let canvasContext = canvas.getContext('2d');
+    let miniMap = document.getElementById('miniMap');
+    let miniMapContext = miniMap.getContext('2d');
+    let chat = document.getElementById('chat');
+    chat.height = chatSize;
+    chat.width = chatSize;
+    chat.style.overflow = 'auto';
     canvas.height = canvasHeight;
     canvas.width = canvasWidth;
     miniMap.height = miniMapHeight;
@@ -111,18 +143,18 @@
     inventory.width = inventoryWidth;
 
 
-    var camera = {
+    let camera = {
         startX: 0,
         startY: 0
     };
 
-    var mauseCoord = {
+    let mauseCoord = {
         x: 0,
         y: 0,
         isDown: false
     };
 
-    var clickedSells = {
+    let clickedSells = {
         x: -1,
         y: -1
     };
