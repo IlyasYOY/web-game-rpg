@@ -159,8 +159,12 @@
         y: -1
     };
 
+    let socket = io.connect();
+    socket.on("get my player number",function (playerNumber) {
+        myPlayer = playerNumber;
+    });
+
     setInterval(function () {
-        let socket = io.connect();
         socket.on("get players",function (newInfoAboutPlayers) {
             players = newInfoAboutPlayers;
         });
