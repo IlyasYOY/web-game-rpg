@@ -1,4 +1,4 @@
-var allSkills = ['fireball','heal','kick','armor'];
+var allSkills = ['fireball', 'heal', 'kick', 'armor'];
 
 typesOfUnit = {
     'magician' : {
@@ -34,10 +34,12 @@ class Player extends Entity{
         this.energy = energy;
     }
 
-    move(newX,newY){
+    move(newX, newY) {
         this.x = newX;
         this.y = newY;
     }
-
-
 }
+
+module.exports.Entity = Entity;
+module.exports.Player = Player;
+module.exports.typesOfUnit = typesOfUnit;

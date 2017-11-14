@@ -4,8 +4,7 @@
 -1 - вода
 3 - камень
 4 - гора
--2 - впадина
-*/
+-2 - впадина*/
 class Map{
     constructor(numberOfCell = 0){
         this.numberOfCell = numberOfCell;
@@ -33,11 +32,11 @@ class Map{
         return this.numberOfCell;
     }
 
-    isVis(i,j){
-        return this.ourMap[i][j].isVisible;
-    }
-
     isEnterable(i,j){
         return this.ourMap[i][j].numb === 0 || this.ourMap[i][j].numb === 1;
+    }
+
+    isVisible(i,j){
+        return this.ourMap[i][j].isVisible;
     }
 }
