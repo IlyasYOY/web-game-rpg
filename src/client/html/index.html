@@ -154,22 +154,25 @@
         y: -1
     };
 
-    playerOne = new Player(0, 0, 0, 10);
-    playerTwo = new Player(3, 0, 0, 10);
-    playerThree = new Player(0, 3, 0, 15);
-    players = [playerOne, playerTwo, playerThree];
-    var myPerson = players[myPlayer];
+//    var playerOne = new Player(0, 0, 0, 10);
+    var playerTwo = new Player(3, 0, 0, 10);
+//    var playerThree = new Player(0, 3, 0, 15);
+    var players;
+//    = [playerOne, playerTwo, playerThree];
+
+    var myPerson = playerTwo;
+//        = playerOne;
 
     var socket = io.connect();
 
-
-
     socket.on("get_player",function (player) {
-        myPerson = player;
+        myPerson = JSON.parse(player);
+        console.log(myPerson);
     });
 
     socket.on("get_map",function (mMap) {
         map = JSON.parse(mMap);
+        console.log('get_map');
     });
 
     setInterval(function () {

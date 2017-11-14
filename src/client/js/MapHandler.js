@@ -14,7 +14,7 @@ var cursorHandler = function (i,j) {
             clickedSells.x = i;
             clickedSells.y = j;
             mauseCoord.isDown = false;
-            if (map.isEnterable(i,j) === true && map.isVis(i,j)===true && mauseCoord.x<=canvasHeight){
+            if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
                 socket.emit('do_step',{'x' : i,'y' : j});
                 myPerson.x = i;
                 myPerson.y = j;
@@ -90,6 +90,7 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
 
 var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
     canvasContext.fillStyle = "#b90084";
+    canvasContext.fillRect((myPerson.x - startX)*(sizeOfCell),(myPerson.y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     for (var i in players){
         //canvasContext.fillRect((players[i].x - startX)*(sizeOfCell+10) + 5,(players[i].y - startY)*(sizeOfCell+10) + 5,sizeOfCell - 10,sizeOfCell - 10);
         canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
@@ -98,8 +99,8 @@ var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
 
 var printMap = function () {
 
-    for (var i = camera.startX;i<map.getNumberOfCell();++i){
-        for (var j = camera.startY;j<map.getNumberOfCell();++j){
+    for (var i = camera.startX;i<map.numberOfCell;++i){
+        for (var j = camera.startY;j<map.numberOfCell;++j){
             printCell(i,j,camera.startX,camera.startY,sizeOfCell,canvasContext);
             printPlayers(camera.startX,camera.startY,sizeOfCell,canvasContext);
 
@@ -107,10 +108,10 @@ var printMap = function () {
     }
 
 
-    for (var i = 0;i<map.getNumberOfCell();++i){
-        for (var j = 0;j<map.getNumberOfCell();++j){
-            printCell(i,j,0,0,miniMapHeight/map.getNumberOfCell(),miniMapContext);
-            printPlayers(0,0,miniMapHeight/map.getNumberOfCell(),miniMapContext);
+    for (var i = 0;i<map.numberOfCell;++i){
+        for (var j = 0;j<map.numberOfCell;++j){
+            printCell(i,j,0,0,miniMapHeight/map.numberOfCell,miniMapContext);
+            printPlayers(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
             cursorHandler(i,j);
         }
     }
