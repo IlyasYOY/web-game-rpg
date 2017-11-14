@@ -160,6 +160,15 @@
     };
 
     setInterval(function () {
+        let socket = io.connect();
+        socket.on("get players",function (newInfoAboutPlayers) {
+            players = newInfoAboutPlayers;
+        });
+
+        socket.on("get map",function (newMap) {
+            map = newMap;
+        });
+
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
         if (whereAmI === 'Menu') {
             menuHandler();
@@ -168,7 +177,7 @@
         } else if (whereAmI === 'Fight') {
             fightHandler(myPlayer, myEnemy);
         }
-    }, 100);
+    }, 1000 / 60);
 
     canvas.onmousemove = function (event) {
         mauseCoord.x = event.pageX;
@@ -207,8 +216,6 @@
     window.onkeydown = function (event) {
         setKeyPush(event.keyCode);
     };
-
-
 </script>
 </body>
 </html>

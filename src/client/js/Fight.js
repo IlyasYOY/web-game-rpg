@@ -1,13 +1,12 @@
 var kickAnimation = function () {
     canvasContext.font = "20px Georgia";
     canvasContext.fillText('Na nahuy! ', 250, 80);
-    for (let i = 0;i<20;++i){
+    for (var i = 0;i<20;++i){
         canvasContext.clearRect(50+i,250,0,0);
         drawWarrior(50 + 20*i,250);
     }
 };
-
-var doAttack = function () {
+ var doAttack = function () {
     if (clickedSells.x !== -1 && clickedSells.y !== -1) {
         kickAnimation();
         clickedSells.x = -1;
@@ -16,23 +15,19 @@ var doAttack = function () {
 };
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
-    if (x>=i*(sizeOfCell)
-        && y>=j*(sizeOfCell)
-        && x<=(i*(sizeOfCell)+sizeOfCell)
-        && y<=(j*(sizeOfCell)+sizeOfCell)){
-        return true;
-    } else {
-        return false;
-    }
+    return x >= i * (sizeOfCell)
+        && y >= j * (sizeOfCell)
+        && x <= (i * (sizeOfCell) + sizeOfCell)
+        && y <= (j * (sizeOfCell) + sizeOfCell);
 };
 
 var cuHandler = function (me) {
-    let i = 0;
-    let k = -1;
-    for (key in players[me].skills){
-        if (i%5 === 0) ++k;
-        if (isInSquare(i,k,40,mauseCoord.x - canvasHeight,mauseCoord.y - miniMapWidth)){
-            if (mauseCoord.isDown === true){
+    var i = 0;
+    var k = -1;
+    for (key in players[me].skills) {
+        if (i % 5 === 0) ++k;
+        if (isInSquare(i, k, 40, mauseCoord.x - canvasHeight, mauseCoord.y - miniMapWidth)) {
+            if (mauseCoord.isDown === true) {
                 clickedSells.x = i;
                 clickedSells.y = k;
                 mauseCoord.isDown = false;
@@ -40,7 +35,7 @@ var cuHandler = function (me) {
         }
         ++i;
         inventoryContext.fillStroke = "#000000";
-        inventoryContext.strokeRect((clickedSells.x * 40) % 200,clickedSells.y*40,40,40);
+        inventoryContext.strokeRect((clickedSells.x * 40) % 200, clickedSells.y * 40, 40, 40);
     }
 };
 
@@ -79,8 +74,8 @@ var writeStat = function (me,enemy) {
 
 var drawSkills = function (me) {
     inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
-    let i = 0;
-    let k = -1;
+    var i = 0;
+    var k = -1;
     for (key in players[me].skills){
         if (i%5 === 0) ++k;
         if (key === 'fireball'){

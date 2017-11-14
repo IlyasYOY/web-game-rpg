@@ -1,4 +1,3 @@
-
 var cursorHandler = function (i,j) {
     if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)){
         canvasContext.fillStyle = '#ffffff';
@@ -18,7 +17,7 @@ var cursorHandler = function (i,j) {
             if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
                 players[myPlayer].x = i;
                 players[myPlayer].y = j;
-                for (let k = 0;k<players.length;++k){
+                for (var k = 0;k<players.length;++k){
                     if (players[k].x === players[myPlayer].x &&
                         players[k].y === players[myPlayer].y &&
                         k!==myPlayer){
@@ -50,14 +49,10 @@ var cursorHandler = function (i,j) {
 
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
-    if (x>=i*(sizeOfCell)
-        && y>=j*(sizeOfCell)
-        && x<=(i*(sizeOfCell)+sizeOfCell)
-        && y<=(j*(sizeOfCell)+sizeOfCell)){
-        return true;
-    } else {
-        return false;
-    }
+    return x >= i * (sizeOfCell)
+        && y >= j * (sizeOfCell)
+        && x <= (i * (sizeOfCell) + sizeOfCell)
+        && y <= (j * (sizeOfCell) + sizeOfCell);
 };
 
 var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
@@ -94,7 +89,7 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
 
 var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
     canvasContext.fillStyle = "#b90084";
-    for (let i = 0;i < players.length; ++i){
+    for (var i = 0;i < players.length; ++i){
         //canvasContext.fillRect((players[i].x - startX)*(sizeOfCell+10) + 5,(players[i].y - startY)*(sizeOfCell+10) + 5,sizeOfCell - 10,sizeOfCell - 10);
         canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     }
@@ -102,8 +97,8 @@ var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
 
 var printMap = function () {
 
-    for (let i = camera.startX;i<map.getNumberOfCell();++i){
-        for (let j = camera.startY;j<map.getNumberOfCell();++j){
+    for (var i = camera.startX;i<map.getNumberOfCell();++i){
+        for (var j = camera.startY;j<map.getNumberOfCell();++j){
             printCell(i,j,camera.startX,camera.startY,sizeOfCell,canvasContext);
             printPlayers(camera.startX,camera.startY,sizeOfCell,canvasContext);
 
@@ -111,8 +106,8 @@ var printMap = function () {
     }
 
 
-    for (let i = 0;i<map.getNumberOfCell();++i){
-        for (let j = 0;j<map.getNumberOfCell();++j){
+    for (var i = 0;i<map.getNumberOfCell();++i){
+        for (var j = 0;j<map.getNumberOfCell();++j){
             printCell(i,j,0,0,miniMapHeight/map.getNumberOfCell(),miniMapContext);
             printPlayers(0,0,miniMapHeight/map.getNumberOfCell(),miniMapContext);
             cursorHandler(i,j);
