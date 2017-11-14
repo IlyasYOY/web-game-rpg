@@ -169,6 +169,10 @@
             map = newMap;
         });
 
+        socket.on("where am i",function (where) {
+            WhereAmI = where;
+        });
+
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
         if (whereAmI === 'Menu') {
             menuHandler();

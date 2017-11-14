@@ -15,6 +15,8 @@ var cursorHandler = function (i,j) {
             clickedSells.y = j;
             mauseCoord.isDown = false;
             if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
+                var socket = io.connect();
+                socket.emit('do step player with numb to x, y', myPlayer,i,j);
                 players[myPlayer].x = i;
                 players[myPlayer].y = j;
                 for (var k = 0;k<players.length;++k){
