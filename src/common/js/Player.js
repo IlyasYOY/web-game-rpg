@@ -1,17 +1,25 @@
+var allSkills = ['fireball','heal','kick','armor'];
+
 typesOfUnit = {
-    "magician" : {
+    'magician' : {
+        health : 80,
         power : 5,
         speed : 10,
         luck : 15,
-        skills : {}
+        skills : {'fireball' : 10,
+            'heal' : 5}
     },
-    "warrior" : {
+    'warrior' : {
+        health : 100,
         power : 10,
         speed : 5,
         luck : 10,
-        skills : {}
+        skills : {
+            'kick' : 10,
+            'armor' : 5
+        }
     },
-    "archer" : {
+    'archer' : {
         power : 7,
         speed : 15,
         luck : 12,
@@ -52,8 +60,11 @@ class Player extends Entity{
     constructor(x = 0,y = 0,direction = 0, typeOfUnit = 'magician', energy = 10){
         super(x,y,direction);
         this.inventory = {};
+        this.unit = typesOfUnit[typeOfUnit];
         this.typeOfUnit = typeOfUnit;
         this.energy = energy;
+        this.health = typesOfUnit[typeOfUnit].health;
+        this.skills = typesOfUnit[typeOfUnit].skills;
     }
 
     move(newX,newY){

@@ -18,15 +18,15 @@ var printMenu = function(chainedPoint){
 };
 
 var menuHandler = function () {
-    if (keysPushed[ButtonsKeys['up']] == true){
+    if (keysPushed[ButtonsKeys['up']] === true){
         if (Menu.numberOfPoint>0) --Menu.numberOfPoint;
     }
 
-    if (keysPushed[ButtonsKeys['down']] == true){
+    if (keysPushed[ButtonsKeys['down']] === true){
         if ((Menu.numberOfPoint+1)<Menu.menuPoints.length) ++Menu.numberOfPoint;
     }
 
-    if (keysPushed[ButtonsKeys['enter']] == true){
+    if (keysPushed[ButtonsKeys['enter']] === true){
         whereAmI = Menu.menuPoints[Menu.numberOfPoint];
     }
 
