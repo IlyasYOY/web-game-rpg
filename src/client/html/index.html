@@ -8,6 +8,7 @@
     <script src="/client/js/Menu.js"></script>
     <script src="/client/js/buttons_keys.js"></script>
     <script src="/client/js/MapHandler.js"></script>
+    <script src="/client/js/Fight.js"></script>
     <script src="/common/js/Map.js"></script>
     <script src="/common/js/Player.js"></script>
     <style>
@@ -18,134 +19,207 @@
         #miniMap {
             vertical-align: top;
         }
+
+        #chat {
+            width: 200px; /* ширина нашего блока */
+            height: 125px; /* высота нашего блока */
+            background: #fff; /* цвет фона, белый */
+            border: 1px solid black; /* размер и цвет границы блока */
+            overflow: auto; /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
+        }
+
+        #inputToChat{
+            width: 200px; /* ширина нашего блока */
+            height: 25px; /* высота нашего блока */
+            background: #fff; /* цвет фона, белый */
+            border: 1px solid black; /* размер и цвет границы блока */
+        }
+
+        input{
+            width: 100%;
+        }
+
     </style>
 </head>
-
 <body>
-    <div align="left">
-        <canvas id="canvas"></canvas>
-        <canvas id="miniMap"></canvas>
+<div align="left">
+    <canvas style="float: left;" id="canvas"></canvas>
+
+
+    <div style="float: left;">
+        <canvas style="float: left" id="miniMap"></canvas>
+        <div style="float: none;">
+            <canvas style="float: none" id="inv"></canvas>
+            <form>
+            <div style="float: none;" id="chat">
+                chat
+            </div>
+            <input style="float: none;" id="inputToChat" type="text"/>
+                <div>
+                <input type="submit" />
+                </div>
+            </form>
+        </div>
     </div>
-    <script>
-        // Socket.io initialization.
-        let socket = io();
+</div>
+<!--<div>-->
+<!--&lt;!&ndash;<canvas id="miniMap"></canvas>&ndash;&gt;-->
+<!--&lt;!&ndash;<canvas id="inventory"></canvas>&ndash;&gt;-->
+<!--</div>-->
 
-        let map = new Map(30);
 
-        for (let k = 15; k < 20; ++k) {
-            for (let d = 15; d < 20; ++d) {
-                map.setCell(k, d, -1);
-            }
+<script>
+    mapSize = 20;
+    let map = new Map(mapSize);
+
+    for (let k = 15; k < 20; ++k) {
+        for (let d = 15; d < 20; ++d) {
+            map.setCell(k, d, -1);
         }
+    }
 
-        for (let k = 5; k < 7; ++k) {
-            for (let d = 5; d < 7; ++d) {
-                map.setCell(k, d, 1);
-            }
+    for (let k = 5; k < 7; ++k) {
+        for (let d = 5; d < 7; ++d) {
+            map.setCell(k, d, 1);
         }
+    }
 
-        map.setCell(3, 4, 2);
-        map.setCell(1, 3, 3);
+    map.setCell(3, 4, 2);
+    map.setCell(1, 3, 3);
 
-        for (let k = 4; k < 7; ++k) {
-            for (let d = 0; d < 3; ++d) {
-                map.setCell(k, d, 4);
-            }
+    for (let k = 4; k < 7; ++k) {
+        for (let d = 0; d < 3; ++d) {
+            map.setCell(k, d, 4);
         }
+    }
 
-        for (let k = 2; k < 5; ++k) {
-            for (let d = 13; d < 15; ++d) {
-                map.setCell(k, d, -2);
-            }
+    for (let k = 2; k < 5; ++k) {
+        for (let d = 13; d < 15; ++d) {
+            map.setCell(k, d, -2);
         }
+    }
 
 
-    </script>
+</script>
 
 
-    <script>
-        playerOne = new Player(0, 0, 0, 'magician', 10);
-        playerTwo = new Player(3, 0, 0, 'warrior', 10);
+<script>
+    playerOne = new Player(0, 0, 0, 'magician', 10);
+    playerTwo = new Player(3, 0, 0, 'warrior', 10);
+    playerThree = new Player(0, 3, 0, 'magician', 15);
+    players = [playerOne, playerTwo, playerThree];
+</script>
 
-        players = [playerOne, playerTwo];
-    </script>
+<script type="text/javascript">
 
-    <script type="text/javascript">
+    let whereAmI = 'Menu';
+    let myPlayer = 0;
+    let myEnemy = -1;
 
-        var whereAmI = 'Menu';
-        var myPlayer = 0;
-
-        var canvasWidth = 600;
-        var canvasHeight = 600;
-        var miniMapWidth = canvasWidth / 3;
-        var miniMapHeight = canvasHeight / 3;
-        var numbersOfCell = 10;
-        var sizeOfCell = canvasHeight / numbersOfCell;
-        var canvas = document.getElementById('canvas');
-        var canvasContext = canvas.getContext('2d');
-        var miniMap = document.getElementById('miniMap');
-        var miniMapContext = miniMap.getContext('2d');
-        canvas.height = canvasHeight;
-        canvas.width = canvasWidth;
-        miniMap.height = miniMapHeight;
-        miniMap.width = miniMapWidth;
-
-        var camera = {
-            startX: 0,
-            startY: 0
-        };
-
-        var mauseCoord = {
-            x: 0,
-            y: 0,
-            isDown: false
-        };
-
-        var clickedSells = {
-            x: -1,
-            y: -1
-        };
+    let canvasWidth = 600;
+    let canvasHeight = 600;
+    let miniMapWidth = canvasWidth / 3;
+    let miniMapHeight = canvasHeight / 3;
+    let inventoryWidth = canvasWidth / 3;
+    let inventoryHeight = canvasHeight / 3;
+    let chatSize = inventoryHeight;
+    let numbersOfCell = 10;
+    let sizeOfCell = canvasHeight / numbersOfCell;
+    let inventory = document.getElementById('inv');
+    let inventoryContext = inventory.getContext('2d');
+    let canvas = document.getElementById('canvas');
+    let canvasContext = canvas.getContext('2d');
+    let miniMap = document.getElementById('miniMap');
+    let miniMapContext = miniMap.getContext('2d');
+    let chat = document.getElementById('chat');
+    chat.height = chatSize;
+    chat.width = chatSize;
+    chat.style.overflow = 'auto';
+    canvas.height = canvasHeight;
+    canvas.width = canvasWidth;
+    miniMap.height = miniMapHeight;
+    miniMap.width = miniMapWidth;
+    inventory.height = inventoryHeight;
+    inventory.width = inventoryWidth;
 
 
-        setInterval(function () {
-            canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
-            if (whereAmI === 'Menu') {
-                menuHandler();
-            } else if (whereAmI === 'Play') {
-                toMap();
-            }
-        }, 100);
+    let camera = {
+        startX: 0,
+        startY: 0
+    };
 
-        canvas.onmousemove = function (event) {
-            mauseCoord.x = event.pageX;
-            mauseCoord.y = event.pageY;
-            console.log(mauseCoord.x + ' / ' + mauseCoord.y)
-        };
+    let mauseCoord = {
+        x: 0,
+        y: 0,
+        isDown: false
+    };
 
-        canvas.onclick = function (event) {
-            mauseCoord.isDown = true;
-        };
+    let clickedSells = {
+        x: -1,
+        y: -1
+    };
 
-        miniMap.onmousemove = function (event) {
-            mauseCoord.x = event.pageX;
-            mauseCoord.y = event.pageY;
-            console.log(mauseCoord.x + ' / ' + mauseCoord.y)
-        };
+    setInterval(function () {
+        let socket = io.connect();
+        socket.on("get players",function (newInfoAboutPlayers) {
+            players = newInfoAboutPlayers;
+        });
 
-        miniMap.onclick = function (event) {
-            mauseCoord.isDown = true;
-        };
+        socket.on("get map",function (newMap) {
+            map = newMap;
+        });
 
-        window.onkeyup = function (event) {
-            setKeyUp(event.keyCode);
-        };
+        socket.on("where am i",function (where) {
+            WhereAmI = where;
+        });
 
-        window.onkeydown = function (event) {
-            setKeyPush(event.keyCode);
-        };
+        canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        if (whereAmI === 'Menu') {
+            menuHandler();
+        } else if (whereAmI === 'Play') {
+            toMap();
+        } else if (whereAmI === 'Fight') {
+            fightHandler(myPlayer, myEnemy);
+        }
+    }, 1000 / 60);
 
+    canvas.onmousemove = function (event) {
+        mauseCoord.x = event.pageX;
+        mauseCoord.y = event.pageY;
+        console.log(mauseCoord.x + ' / ' + mauseCoord.y)
+    };
 
-    </script>
+    canvas.onclick = function (event) {
+        mauseCoord.isDown = true;
+    };
+
+    inventory.onmousemove = function (event) {
+        mauseCoord.x = event.pageX;
+        mauseCoord.y = event.pageY;
+        console.log(mauseCoord.x + ' / ' + mauseCoord.y)
+    };
+
+    inventory.onclick = function (event) {
+        mauseCoord.isDown = true;
+    };
+
+    //    miniMap.onmousemove = function (event) {
+    //        mauseCoord.x = event.pageX;
+    //        mauseCoord.y = event.pageY;
+    //        console.log(mauseCoord.x + ' / ' + mauseCoord.y)
+    //    };
+    //
+    //    miniMap.onclick = function (event) {
+    //        mauseCoord.isDown = true;
+    //    };
+
+    window.onkeyup = function (event) {
+        setKeyUp(event.keyCode);
+    };
+
+    window.onkeydown = function (event) {
+        setKeyPush(event.keyCode);
+    };
+</script>
 </body>
-
 </html>
