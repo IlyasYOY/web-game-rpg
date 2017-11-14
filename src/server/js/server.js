@@ -30,11 +30,12 @@ module.exports = function startServer(dir) {
         socket.player = new Player(0, 0, 0, 10);
         moveHandler.moveQueue.push(socket.id);
         socket.emit("get_player", socket.player);
-        fs.readFile(path.join("./json", `${mapName}.json`), function (err, data) {
+        fs.readFile(path.join(dir, "/src/server/js/json", `${mapName}.json`), function (err, buffer) {
             if (err) {
-                //
+                throw err;
             }
-            socket.emit("get_map", data);
+            console.log(buffer);
+            socket.emit("get_map", buffer);
         });
         socket.emit("get_players", getPlayers());
 
