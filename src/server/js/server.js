@@ -1,4 +1,4 @@
-let Player = require('../../common/js/Player');
+let Player = require('../../common/js/Player').Player;
 let fs = require('fs');
 let path = require('path');
 let express = require('express');
@@ -27,10 +27,10 @@ module.exports = function startServer(dir) {
 
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
-        socket.player = new Player();
+        socket.player = new Player(0, 0, 0, 10);
         moveHandler.moveQueue.push(socket.id);
         socket.emit("get_player", socket.player);
-        readFile(path.join("./json", `${mapName}.json`), function (err, data) {
+        fs.readFile(path.join("./json", `${mapName}.json`), function (err, data) {
             if (err) {
                 //
             }
@@ -62,10 +62,12 @@ module.exports = function startServer(dir) {
         socket.on("fight", function(socketid) {
             
         });
+
+        socket.on("disconnect", function () {
+            //...
+        });
     });
-    socket.on("disconnect", function () {
-        //...
-    });
+    
 };
 
 http.listen(port, function () {
