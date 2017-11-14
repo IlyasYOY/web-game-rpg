@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>new player</title>
+</head>
+<body>
+
+<form>
+    <label for="playerName">Введите ваше имя</label>
+    <input type="text" id="playerName" />
+    <button onclick="newPlayer();"></button>
+</form>
+
+<script>
+    var newPlayer = function () {
+        var socket = io.connect();
+        socket.emit('new player',document.getElementById('playerName'));
+    }
+</script>
+
+</body>
+</html>
