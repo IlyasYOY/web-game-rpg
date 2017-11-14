@@ -66,7 +66,6 @@ module.exports = function startServer(dir) {
     socket.on("disconnect", function () {
         //...
     });
-    configureSocket(socket)
 };
 
 http.listen(port, function () {
