@@ -6,65 +6,32 @@ typesOfUnit = {
         power : 5,
         speed : 10,
         luck : 15,
-        skills : {'fireball' : 10,
-            'heal' : 5}
+        intelegente : 10,
     },
     'warrior' : {
         health : 100,
         power : 10,
         speed : 5,
         luck : 10,
-        skills : {
-            'kick' : 10,
-            'armor' : 5
-        }
+        intelegente : 5,
     },
-    'archer' : {
-        power : 7,
-        speed : 15,
-        luck : 12,
-        skills : {}
-    }
-}
+};
 
 class Entity{
-    constructor(x = 0,y = 0,direction = 0,typeOfUnit = "magician"){
+    constructor(x = 0,y = 0,direction = 0){
         this.x = x;
         this.y = y;
         this.direction = direction;
-        this.typeOfunit = typeOfUnit;
-    }
-
-    getX(){
-        return this.x;
-    }
-
-    getY(){
-        return this.y;
-    }
-
-    setX(value){
-        this.x = value;
-    }
-
-    setY(value){
-        this.y = value;
-    }
-
-    getDirection(){
-        return this.direction;
     }
 }
 
 class Player extends Entity{
-    constructor(x = 0,y = 0,direction = 0, typeOfUnit = 'magician', energy = 10){
+    constructor(x = 0,y = 0,direction = 0, energy = 10){
         super(x,y,direction);
+        this.rangeOfVisobility = 10;
         this.inventory = {};
-        this.unit = typesOfUnit[typeOfUnit];
-        this.typeOfUnit = typeOfUnit;
+        this.units = {'warrior' : 5, 'magician' : 5};
         this.energy = energy;
-        this.health = typesOfUnit[typeOfUnit].health;
-        this.skills = typesOfUnit[typeOfUnit].skills;
     }
 
     move(newX,newY){

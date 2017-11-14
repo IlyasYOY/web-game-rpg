@@ -15,7 +15,7 @@
 <script>
     var newPlayer = function () {
         var socket = io.connect();
-        socket.emit('new player',document.getElementById('playerName'));
+        socket.emit('new player',document.getElementById('playerName').valueOf());
     }
 </script>
 

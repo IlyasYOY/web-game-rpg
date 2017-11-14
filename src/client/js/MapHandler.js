@@ -17,8 +17,8 @@ var cursorHandler = function (i,j) {
             if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
                 var socket = io.connect();
                 socket.emit('do step player with numb to x, y', myPlayer,i,j);
-                players[myPlayer].x = i;
-                players[myPlayer].y = j;
+                myPerson.x = i;
+                myPerson.y = j;
                 for (var k = 0;k<players.length;++k){
                     if (players[k].x === players[myPlayer].x &&
                         players[k].y === players[myPlayer].y &&
