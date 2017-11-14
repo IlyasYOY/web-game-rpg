@@ -112,6 +112,8 @@
 
 <script type="text/javascript">
 
+
+
     let whereAmI = 'Menu';
     let myPlayer = 0;
     let myEnemy = -1;
@@ -142,7 +144,6 @@
     inventory.height = inventoryHeight;
     inventory.width = inventoryWidth;
 
-
     let camera = {
         startX: 0,
         startY: 0
@@ -159,14 +160,21 @@
         y: -1
     };
 
+    var socket = io.connect();
+
+    var myPerson = players[myPlayer];
+
+    socket.on("get_player",function (player) {
+        myPerson = player;
+    });
+
     setInterval(function () {
-        let socket = io.connect();
-        socket.on("get players",function (newInfoAboutPlayers) {
-            players = newInfoAboutPlayers;
-        });
+//        socket.on("get players",function (newInfoAboutPlayers) {
+//            players = newInfoAboutPlayers;
+//        });
 
         socket.on("get map",function (newMap) {
-            map = newMap;
+            map = JSON.parse(newMap);
         });
 
         socket.on("where am i",function (where) {
