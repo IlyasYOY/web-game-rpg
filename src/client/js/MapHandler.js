@@ -14,24 +14,23 @@ var cursorHandler = function (i,j) {
             clickedSells.x = i;
             clickedSells.y = j;
             mauseCoord.isDown = false;
-            if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
-                var socket = io.connect();
-                socket.emit('do step player with numb to x, y', myPlayer,i,j);
+            if (map.isEnterable(i,j) === true && map.isVis(i,j)===true && mauseCoord.x<=canvasHeight){
+                socket.emit('do_step',{'x' : i,'y' : j});
                 myPerson.x = i;
                 myPerson.y = j;
-                for (var k = 0;k<players.length;++k){
-                    if (players[k].x === players[myPlayer].x &&
-                        players[k].y === players[myPlayer].y &&
-                        k!==myPlayer){
-                        clickedSells.x = -1;
-                        clickedSells.y = -1;
-                        myEnemy = k;
-                        fightHandler(myPlayer,myEnemy);
+                // for (var k = 0;k<players.length;++k){
+                //     if (players[k].x === players[myPlayer].x &&
+                //         players[k].y === players[myPlayer].y &&
+                //         k!==myPlayer){
+                //         clickedSells.x = -1;
+                //         clickedSells.y = -1;
+                //         myEnemy = k;
+                //         whereAmI = 'FightMenu';
                     }
                 }
             }
-        }
-    }
+        };
+
     // if (isInSquare(i,j,miniMapHeight/map.getNumberOfCell(),mauseCoord.x - canvasHeight,mauseCoord.y)){
     //     console.log(i + " / " + j);
     //     miniMapContext.fillStyle = '#ffffff';
@@ -47,7 +46,7 @@ var cursorHandler = function (i,j) {
     //         }
     //     }
     // }
-};
+
 
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
@@ -91,7 +90,7 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
 
 var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
     canvasContext.fillStyle = "#b90084";
-    for (var i = 0;i < players.length; ++i){
+    for (var i in players){
         //canvasContext.fillRect((players[i].x - startX)*(sizeOfCell+10) + 5,(players[i].y - startY)*(sizeOfCell+10) + 5,sizeOfCell - 10,sizeOfCell - 10);
         canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     }

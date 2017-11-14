@@ -9,6 +9,7 @@
     <script src="/client/js/buttons_keys.js"></script>
     <script src="/client/js/MapHandler.js"></script>
     <script src="/client/js/Fight.js"></script>
+    <script src="/client/js/FightMenu.js"></script>
     <script src="/common/js/Map.js"></script>
     <script src="/common/js/Player.js"></script>
     <style>
@@ -103,13 +104,6 @@
 </script>
 
 
-<script>
-    playerOne = new Player(0, 0, 0, 'magician', 10);
-    playerTwo = new Player(3, 0, 0, 'warrior', 10);
-    playerThree = new Player(0, 3, 0, 'magician', 15);
-    players = [playerOne, playerTwo, playerThree];
-</script>
-
 <script type="text/javascript">
 
 
@@ -160,34 +154,57 @@
         y: -1
     };
 
+    playerOne = new Player(0, 0, 0, 10);
+    playerTwo = new Player(3, 0, 0, 10);
+    playerThree = new Player(0, 3, 0, 15);
+    players = [playerOne, playerTwo, playerThree];
+    var myPerson = players[myPlayer];
+
     var socket = io.connect();
 
-    var myPerson = players[myPlayer];
+
 
     socket.on("get_player",function (player) {
         myPerson = player;
     });
 
-    setInterval(function () {
-//        socket.on("get players",function (newInfoAboutPlayers) {
-//            players = newInfoAboutPlayers;
-//        });
+    socket.on("get_map",function (mMap) {
+        map = JSON.parse(mMap);
+    });
 
-        socket.on("get map",function (newMap) {
-            map = JSON.parse(newMap);
+    setInterval(function () {
+        socket.on("who_moves",function (id) {
+            if(socket.id == id){
+                if (whereAmI === "Wait"){
+                        whereAmI = "Map";}
+            } else {
+                //здесь должна быть другая реализация
+                whereAmI = "Wait";
+            }
         });
 
-        socket.on("where am i",function (where) {
-            WhereAmI = where;
+        socket.on('get_players',function (mPlayers) {
+            players = mPlayers;
+        });
+
+        socket.on("game_stage",function (wh) {
+            WhereAmI = wh.stage;
+            myEnemy = wh.from;
         });
 
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
         if (whereAmI === 'Menu') {
             menuHandler();
-        } else if (whereAmI === 'Play') {
+        } else if(whereAmI === 'FightMenu'){
+            fightMenuHandler();
+        } else if (whereAmI === 'Map') {
             toMap();
         } else if (whereAmI === 'Fight') {
             fightHandler(myPlayer, myEnemy);
+        } else if (whereAmI === 'Wait') {
+            canvasContext.font="20px Georgia";
+            canvasContext.fillStyle = "#000000";
+            canvasContext.fillText('Please Wait',300,300);
         }
     }, 1000 / 60);
 
