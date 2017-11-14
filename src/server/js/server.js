@@ -23,18 +23,17 @@ module.exports = function startServer(dir) {
             this.step %= this.moveQueue.length; 
         }
     }
-    let mapName = "map1";
+    let currentMapName = "map1";
 
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
         socket.player = new Player(0, 0, 0, 10);
         moveHandler.moveQueue.push(socket.id);
-        socket.emit("get_player", socket.player);
-        fs.readFile(path.join(dir, "/src/server/js/json", `${mapName}.json`), function (err, buffer) {
+        socket.emit("get_player", JSON.stringify(socket.player));
+        fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
             if (err) {
                 throw err;
             }
-            console.log(buffer);
             socket.emit("get_map", buffer);
         });
         socket.emit("get_players", getPlayers());
