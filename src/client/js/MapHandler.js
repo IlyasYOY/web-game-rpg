@@ -14,7 +14,7 @@ var cursorHandler = function (i,j) {
             clickedSells.x = i;
             clickedSells.y = j;
             mauseCoord.isDown = false;
-            if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight){
+            if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight){
                 myPerson.x = i;
                 myPerson.y = j;
                 reloadMiniMap();
@@ -69,7 +69,7 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
     } else if (map.ourMap[i][j] === 2){
         canvasContext.fillStyle = '#00ff15';
     } else if (map.ourMap[i][j] === 3){
-        canvasContext.fillStyle = '#adadad';
+        canvasContext.fillStyle = '#696d7e';
     }else if (map.ourMap[i][j] === -2){
         canvasContext.fillStyle = '#ae875e';
     } else if (map.ourMap[i][j] === 4){

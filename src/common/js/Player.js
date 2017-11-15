@@ -40,6 +40,14 @@ class Player extends Entity{
     }
 }
 
+var rangeOfWalking = function(player,i,j){
+  let distance = 10;
+  let maxSumSpeed = 100;
+  let ratio = 50;
+  distance = parseInt((player.units.warrior*(maxSumSpeed/typesOfUnit['warrior'].speed) + player.units.magician*(maxSumSpeed/typesOfUnit['magician'].speed))/ratio);
+    return Math.abs(player.x - i) <= distance && Math.abs(player.y - j) <= distance;
+};
+
 module.exports.Entity = Entity;
 module.exports.Player = Player;
 module.exports.typesOfUnit = typesOfUnit;
