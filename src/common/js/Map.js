@@ -40,5 +40,6 @@ var isEnterable = function(map,i,j){
 };
 
 var fogOfWar = function(player,i,j){
-    return Math.abs(player.x - i) <= 5 && Math.abs(player.y - j) <= 5;
+    let distance = 3
+    return Math.abs(player.x - i) <= distance && Math.abs(player.y - j) <= distance;
 };
