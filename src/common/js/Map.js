@@ -12,31 +12,29 @@ class Map{
         for (let i = 0;i<numberOfCell;++i){
             this.ourMap[i] = [];
             for (let j = 0;j<numberOfCell;++j) {
-                this.ourMap[i][j] = {
-                    numb : 0,
-                    isVisible : true
-                };
+                this.ourMap[i][j] = 0
             }
         }
     }
 
     getCell(i,j){
-        return this.ourMap[i][j].numb;
+        return this.ourMap[i][j];
     }
 
     setCell(i,j,value) {
-        this.ourMap[i][j].numb = value;
+        this.ourMap[i][j] = value;
     }
 
     getNumberOfCell(){
         return this.numberOfCell;
     }
 
-    isEnterable(i,j){
-        return this.ourMap[i][j].numb === 0 || this.ourMap[i][j].numb === 1;
-    }
 
     isVisible(i,j){
-        return this.ourMap[i][j].isVisible;
+        return this.ourMap[i][j];
     }
 }
+
+var isEnterable = function(map,i,j){
+    return map.ourMap[i][j] === 0 || map.ourMap[i][j] === 1;
+};

@@ -20,7 +20,7 @@ module.exports = function startServer(dir) {
         "step": 0,
         "nextMove": function() {
             this.step++;
-            this.step %= this.moveQueue.length; 
+            this.step %= this.moveQueue.length;
         }
     };
     let currentMapName = "map1";
@@ -34,18 +34,21 @@ module.exports = function startServer(dir) {
             if (err) {
                 throw err;
             }
-            socket.emit("get_map", buffer);
+            socket.emit("get_map", buffer.toString());
         });
-        socket.emit("get_players", getPlayers());
 
-        socket.on("gett",function () {
-            console.log(socket.player);
+        socket.on("emit_get_players",function () {
+            console.log("emit_get_players");
+            socket.emit("get_players", getPlayers());
+        });
+
+
+        socket.on("emit_get_player",function () {
             socket.emit("get_player", socket.player);
         });
 
         socket.on("do_step", function (step) {
 
-            console.log(socket.player);
             socket.player.x = step.x;
             socket.player.y = step.y;
 
@@ -53,7 +56,7 @@ module.exports = function startServer(dir) {
 
             for (var i in sockets) {
                 if (sockets[i].player.x == step.x && sockets[i].player.y == step.y) {
-                 socket.emit("game_stage", {
+                    socket.emit("game_stage", {
                         "stage": "FightMenu",
                         "from": socket.id
                     });
@@ -68,14 +71,14 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("fight", function(socketid) {
-            
+
         });
 
         socket.on("disconnect", function () {
             //...
         });
     });
-    
+
 };
 
 http.listen(port, function () {
@@ -85,9 +88,11 @@ http.listen(port, function () {
 
 function getPlayers() {
     let players = {};
-    let sockets = io.sockets.connected;
-    for (let sock in sockets) {
-        players[sock.id] = sock.player;
-    }
+
+    var sockets = io.sockets.connected;
+
+    for (var i in sockets)
+        players[sockets[i].id] = sockets[i].player;
+
     return players;
 }

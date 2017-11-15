@@ -4,18 +4,19 @@ var cursorHandler = function (i,j) {
         canvasContext.fillRect((i-camera.startX)*(sizeOfCell),(j-camera.startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
         miniMapContext.fillStyle = '#ffffff';
         if (mauseCoord.x <= canvasHeight)
-            miniMapContext.fillRect(i * miniMapHeight/map.getNumberOfCell(),
-                j * miniMapHeight / map.getNumberOfCell(),
-                miniMapHeight / map.getNumberOfCell(),
-                miniMapHeight / map.getNumberOfCell());
+            miniMapContext.fillRect(i * miniMapHeight/map.umberOfCell,
+                j * miniMapHeight / map.numberOfCell,
+                miniMapHeight / map.numberOfCell,
+                miniMapHeight / map.numberOfCell);
 
         canvasContext.fillStyle = '#000000';
         if (mauseCoord.isDown === true){
             clickedSells.x = i;
             clickedSells.y = j;
             mauseCoord.isDown = false;
-            if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
+            if (isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight){
                 socket.emit('do_step',{'x' : i,'y' : j});
+                socket.emit("emit_get_player");
                 // myPerson.x = i;
                 // myPerson.y = j;
                 // for (var k = 0;k<players.length;++k){
@@ -58,19 +59,19 @@ var isInSquare = function(i,j,sizeOfCell,x,y){
 
 var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
 
-    if (map.getCell(i,j) === 0) {
+    if (map.ourMap[i][j] === 0) {
         canvasContext.fillStyle = '#ffaa62';
-    } else if (map.getCell(i,j) === -1) {
+    } else if (map.ourMap[i][j] === -1) {
         canvasContext.fillStyle = '#0069ff';
-    } else if (map.getCell(i,j) === 2){
+    } else if (map.ourMap[i][j] === 2){
         canvasContext.fillStyle = '#00ff15';
-    } else if (map.getCell(i,j) === 3){
+    } else if (map.ourMap[i][j] === 3){
         canvasContext.fillStyle = '#adadad';
-    }else if (map.getCell(i,j) === -2){
+    }else if (map.ourMap[i][j] === -2){
         canvasContext.fillStyle = '#ae875e';
-    } else if (map.getCell(i,j) === 4){
+    } else if (map.ourMap[i][j] === 4){
         canvasContext.fillStyle = '#d4e8ff';
-    } else if (map.getCell(i,j) === 1){
+    } else if (map.ourMap[i][j] === 1){
         canvasContext.fillStyle = '#fff581';
     }
     //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
@@ -123,11 +124,11 @@ var toMap = function () {
     }
 
     if (keysPushed[ButtonsKeys['down']] === true){
-        if ((camera.startY)<(map.getNumberOfCell() - numbersOfCell)) ++camera.startY;
+        if ((camera.startY)<(map.numberOfCell - numbersOfCell)) ++camera.startY;
     }
 
     if (keysPushed[ButtonsKeys['right']] === true){
-        if ((camera.startX)<(map.getNumberOfCell() - numbersOfCell)) ++camera.startX;
+        if ((camera.startX)<(map.numberOfCell - numbersOfCell)) ++camera.startX;
     }
 
     if (keysPushed[ButtonsKeys['left']] === true){
@@ -140,11 +141,11 @@ var toMap = function () {
     }
 
     if (keysPushed[ButtonsKeys['S']] === true){
-        if ((camera.startY)<(map.getNumberOfCell() - numbersOfCell)) ++camera.startY;
+        if ((camera.startY)<(map.numberOfCell - numbersOfCell)) ++camera.startY;
     }
 
     if (keysPushed[ButtonsKeys['D']] === true){
-        if ((camera.startX)<(map.getNumberOfCell() - numbersOfCell)) ++camera.startX;
+        if ((camera.startX)<(map.numberOfCell - numbersOfCell)) ++camera.startX;
     }
 
     if (keysPushed[ButtonsKeys['A']] === true){
