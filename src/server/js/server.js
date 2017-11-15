@@ -22,7 +22,7 @@ module.exports = function startServer(dir) {
             this.step++;
             this.step %= this.moveQueue.length; 
         }
-    }
+    };
     let currentMapName = "map1";
 
     io.on("connect", function (socket) {
@@ -39,19 +39,23 @@ module.exports = function startServer(dir) {
         socket.emit("get_players", getPlayers());
 
         socket.on("do_step", function (step) {
+
+            console.log(step);
             socket.player.x = step.x;
             socket.player.y = step.y;
+            console.log(socket.player);
 
-            let sockets = io.sockets.connected;
-            for (let sock in sockets) {
-                if (sock.player.x == step.x && sock.player.y == step.y) {
-                 sock.emit("game_stage", {
+            var sockets = io.sockets.connected;
+
+            for (var i in sockets) {
+                if (sockets[i].player.x == step.x && sockets[i].player.y == step.y) {
+                 socket.emit("game_stage", {
                         "stage": "FightMenu",
                         "from": socket.id
                     });
                     socket.emit("game_stage", {
                         "stage": "Wait",
-                        "from": sock.id
+                        "from": i.id
                     });
                 }
             }

@@ -170,10 +170,10 @@
         console.log(myPerson);
     });
 
-    socket.on("get_map",function (mMap) {
-        map = mMap;
-        console.log('get_map');
-    });
+//    socket.on("get_map",function (mMap) {
+//        map = mMap;
+//        console.log('get_map');
+//    });
 
     setInterval(function () {
         socket.on("who_moves",function (id) {
