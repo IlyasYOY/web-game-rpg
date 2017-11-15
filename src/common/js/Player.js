@@ -4,14 +4,14 @@ typesOfUnit = {
     'magician' : {
         health : 80,
         power : 5,
-        speed : 10,
+        speed : 5,
         luck : 15,
         intelegente : 10,
     },
     'warrior' : {
         health : 100,
         power : 10,
-        speed : 5,
+        speed : 10,
         luck : 10,
         intelegente : 5,
     },
@@ -41,10 +41,10 @@ class Player extends Entity{
 }
 
 var rangeOfWalking = function(player,i,j){
-  let distance = 10;
+  // let distance = 10;
   let maxSumSpeed = 100;
   let ratio = 50;
-  distance = parseInt((player.units.warrior*(maxSumSpeed/typesOfUnit['warrior'].speed) + player.units.magician*(maxSumSpeed/typesOfUnit['magician'].speed))/ratio);
+  let distance = parseInt((player.units.warrior*(maxSumSpeed/typesOfUnit['warrior'].speed) + player.units.magician*(maxSumSpeed/typesOfUnit['magician'].speed))/ratio);
     return Math.abs(player.x - i) <= distance && Math.abs(player.y - j) <= distance;
 };
 

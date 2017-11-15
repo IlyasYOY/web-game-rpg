@@ -42,6 +42,6 @@ var isEnterable = function(map,i,j){
 var fogOfWar = function(player,i,j){
     let distance = 3;
     let ratio = 50;
-    distance += distance = parseInt((player.units.warrior*typesOfUnit['warrior'].intelegente + player.units.magician*typesOfUnit['magician'].intelegente)/ratio);
+    distance += parseInt((player.units.warrior*typesOfUnit['warrior'].intelegente + player.units.magician*typesOfUnit['magician'].intelegente)/ratio);
     return Math.abs(player.x - i) <= distance && Math.abs(player.y - j) <= distance;
 };

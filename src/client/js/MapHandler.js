@@ -1,10 +1,16 @@
 var cursorHandler = function (i,j) {
     if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)){
-        canvasContext.fillStyle = '#ffffff';
+        if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j)){
+            canvasContext.fillStyle = '#ffffff';
+            miniMapContext.fillStyle = '#ffffff';
+        } else {
+            canvasContext.fillStyle = '#d7001d';
+            miniMapContext.fillStyle = '#d7001d';
+        }
         canvasContext.fillRect((i-camera.startX)*(sizeOfCell),(j-camera.startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
-        miniMapContext.fillStyle = '#ffffff';
+
         if (mauseCoord.x <= canvasHeight)
-            miniMapContext.fillRect(i * miniMapHeight/map.umberOfCell,
+            miniMapContext.fillRect(i * miniMapHeight/map.numberOfCell,
                 j * miniMapHeight / map.numberOfCell,
                 miniMapHeight / map.numberOfCell,
                 miniMapHeight / map.numberOfCell);
@@ -96,12 +102,13 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
 
 var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
     canvasContext.fillStyle = "#b90084";
-    canvasContext.fillRect((myPerson.x - startX)*(sizeOfCell),(myPerson.y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     for (var i in players){
         if (fogOfWar(myPerson,players[i].x,players[i].y) && socket.id != i){
             canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
         }
     }
+    canvasContext.fillStyle = "#6c00b9";
+    canvasContext.fillRect((myPerson.x - startX)*(sizeOfCell),(myPerson.y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
 };
 
 var reloadMiniMap = function () {
