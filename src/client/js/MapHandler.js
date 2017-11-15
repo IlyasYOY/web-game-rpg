@@ -16,8 +16,8 @@ var cursorHandler = function (i,j) {
             mauseCoord.isDown = false;
             if (map.isEnterable(i,j) === true && mauseCoord.x<=canvasHeight){
                 socket.emit('do_step',{'x' : i,'y' : j});
-                myPerson.x = i;
-                myPerson.y = j;
+                // myPerson.x = i;
+                // myPerson.y = j;
                 // for (var k = 0;k<players.length;++k){
                 //     if (players[k].x === players[myPlayer].x &&
                 //         players[k].y === players[myPlayer].y &&

@@ -29,7 +29,7 @@ module.exports = function startServer(dir) {
         console.log(`Socket connected: ${socket.id}`);
         socket.player = new Player(0, 0, 0, 10);
         moveHandler.moveQueue.push(socket.id);
-        socket.emit("get_player", JSON.stringify(socket.player));
+        socket.emit("get_player", socket.player);
         fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
             if (err) {
                 throw err;
@@ -38,12 +38,16 @@ module.exports = function startServer(dir) {
         });
         socket.emit("get_players", getPlayers());
 
+        socket.on("gett",function () {
+            console.log(socket.player);
+            socket.emit("get_player", socket.player);
+        });
+
         socket.on("do_step", function (step) {
 
-            console.log(step);
+            console.log(socket.player);
             socket.player.x = step.x;
             socket.player.y = step.y;
-            console.log(socket.player);
 
             var sockets = io.sockets.connected;
 

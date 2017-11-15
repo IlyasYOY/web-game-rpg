@@ -166,16 +166,20 @@
     var socket = io.connect();
 
     socket.on("get_player",function (player) {
-        myPerson = JSON.parse(player);
+        myPerson = player;
+        console.log('myPerson____________________')
         console.log(myPerson);
     });
 
-//    socket.on("get_map",function (mMap) {
+
+    //    socket.on("get_map",function (mMap) {
 //        map = mMap;
 //        console.log('get_map');
 //    });
 
     setInterval(function () {
+
+        socket.emit("gett");
         socket.on("who_moves",function (id) {
             if(socket.id == id){
                 if (whereAmI === "Wait"){
