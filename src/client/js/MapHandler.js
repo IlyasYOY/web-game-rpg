@@ -14,7 +14,10 @@ var cursorHandler = function (i,j) {
             clickedSells.x = i;
             clickedSells.y = j;
             mauseCoord.isDown = false;
-            if (isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight){
+            if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight){
+                myPerson.x = i;
+                myPerson.y = j;
+                reloadMiniMap();
                 socket.emit('do_step',{'x' : i,'y' : j});
                 socket.emit("emit_get_player");
                 // myPerson.x = i;
@@ -58,7 +61,7 @@ var isInSquare = function(i,j,sizeOfCell,x,y){
 };
 
 var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
-
+    if (fogOfWar(myPerson,i,j)) {
     if (map.ourMap[i][j] === 0) {
         canvasContext.fillStyle = '#ffaa62';
     } else if (map.ourMap[i][j] === -1) {
@@ -73,6 +76,8 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
         canvasContext.fillStyle = '#d4e8ff';
     } else if (map.ourMap[i][j] === 1){
         canvasContext.fillStyle = '#fff581';
+    }} else {
+        canvasContext.fillStyle = '#b9b9b9';
     }
     //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
     canvasContext.fillRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
@@ -93,15 +98,25 @@ var printPlayers = function (startX,startY,sizeOfCell,canvasContext) {
     canvasContext.fillStyle = "#b90084";
     canvasContext.fillRect((myPerson.x - startX)*(sizeOfCell),(myPerson.y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     for (var i in players){
-        //canvasContext.fillRect((players[i].x - startX)*(sizeOfCell+10) + 5,(players[i].y - startY)*(sizeOfCell+10) + 5,sizeOfCell - 10,sizeOfCell - 10);
-        canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+        if (fogOfWar(myPerson,players[i].x,players[i].y) && socket.id != i){
+            canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+        }
+    }
+};
+
+var reloadMiniMap = function () {
+    for (let i = 0;i<map.numberOfCell;++i){
+        for (let j = 0;j<map.numberOfCell;++j){
+            printCell(i,j,0,0,miniMapHeight/map.numberOfCell,miniMapContext);
+            printPlayers(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
+        }
     }
 };
 
 var printMap = function () {
 
-    for (var i = camera.startX;i<map.numberOfCell;++i){
-        for (var j = camera.startY;j<map.numberOfCell;++j){
+    for (let i = camera.startX;i<map.numberOfCell;++i){
+        for (let j = camera.startY;j<map.numberOfCell;++j){
             printCell(i,j,camera.startX,camera.startY,sizeOfCell,canvasContext);
             printPlayers(camera.startX,camera.startY,sizeOfCell,canvasContext);
 
@@ -109,8 +124,8 @@ var printMap = function () {
     }
 
 
-    for (var i = 0;i<map.numberOfCell;++i){
-        for (var j = 0;j<map.numberOfCell;++j){
+    for (let i = 0;i<map.numberOfCell;++i){
+        for (let j = 0;j<map.numberOfCell;++j){
             printCell(i,j,0,0,miniMapHeight/map.numberOfCell,miniMapContext);
             printPlayers(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
             cursorHandler(i,j);

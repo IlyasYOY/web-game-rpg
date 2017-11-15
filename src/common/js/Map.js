@@ -38,3 +38,7 @@ class Map{
 var isEnterable = function(map,i,j){
     return map.ourMap[i][j] === 0 || map.ourMap[i][j] === 1;
 };
+
+var fogOfWar = function(player,i,j){
+    return Math.abs(player.x - i) <= 5 && Math.abs(player.y - j) <= 5;
+};

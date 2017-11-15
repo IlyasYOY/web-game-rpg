@@ -38,7 +38,6 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("emit_get_players",function () {
-            console.log("emit_get_players");
             socket.emit("get_players", getPlayers());
         });
 
