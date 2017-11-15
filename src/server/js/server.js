@@ -29,6 +29,13 @@ module.exports = function startServer(dir) {
         console.log(`Socket connected: ${socket.id}`);
         socket.player = new Player(0, 0, 0, 10);
         moveHandler.moveQueue.push(socket.id);
+        if (moveHandler.moveQueue.length < 3){
+            console.log(moveHandler.moveQueue.length);
+            socket.emit("game_stage", {
+                "stage": "Wait",
+                "from": socket.id
+            });
+        } else{ io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);}
         socket.emit("get_player", socket.player);
         fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
             if (err) {
