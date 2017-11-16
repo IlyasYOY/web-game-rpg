@@ -27,15 +27,24 @@ module.exports = function startServer(dir) {
 
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
+        if (moveHandler.moveQueue.length < 3){
         socket.player = new Player(0, 0, 0, 10);
         moveHandler.moveQueue.push(socket.id);
+        } else {
+            console.log(moveHandler.moveQueue.length);
+            socket.emit("game_stage", {
+                "stage": "Supervisor",
+                "from": -1
+            });
+        }
         if (moveHandler.moveQueue.length < 3){
             console.log(moveHandler.moveQueue.length);
             socket.emit("game_stage", {
                 "stage": "Wait",
-                "from": socket.id
+                "from": -1
             });
-        } else{ io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);}
+        } else if (moveHandler.moveQueue.length === 3)
+        { io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);}
         socket.emit("get_player", socket.player);
         fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
             if (err) {
@@ -60,16 +69,18 @@ module.exports = function startServer(dir) {
 
             var sockets = io.sockets.connected;
 
-            for (var i in sockets) {
-                if (sockets[i].player.x == step.x && sockets[i].player.y == step.y) {
-                    socket.emit("game_stage", {
-                        "stage": "FightMenu",
-                        "from": socket.id
-                    });
-                    socket.emit("game_stage", {
-                        "stage": "Wait",
-                        "from": i.id
-                    });
+            for (let i in sockets) {
+                if (sockets.player !== undefined) {
+                    if (socket.id !== sockets[i].id && sockets[i].player.x == step.x && sockets[i].player.y == step.y) {
+                        socket.emit("game_stage", {
+                            "stage": "FightMenu",
+                            "from": socket.id
+                        });
+                        socket.emit("game_stage", {
+                            "stage": "Wait",
+                            "from": i.id
+                        });
+                    }
                 }
             }
             moveHandler.nextMove();

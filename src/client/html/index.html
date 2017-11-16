@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <title>Game</title>
     <script src="/socket.io/socket.io.js"></script>
+    <script src="/client/js/SuperVisor.js"></script>
     <script src="/client/js/Menu.js"></script>
     <script src="/client/js/buttons_keys.js"></script>
     <script src="/client/js/MapHandler.js"></script>
@@ -189,8 +190,11 @@
             if (whereAmI === 'Wait'){
                 whereAmI = 'Map';}
         } else {
+            if(whereAmI!=='Supervisor'){
             whereAmI = 'Wait';
+            }
         }
+        console.log(whereAmI);
     });
 
     setInterval(function () {
@@ -198,6 +202,15 @@
         socket.emit("emit_get_players");
 
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
+        if (whereAmI === 'Wait') {
+            canvas.style.opacity = "0.5";
+            reloadMainMap();
+            canvasContext.font="20px Georgia";
+            canvasContext.fillStyle = "#000000";
+            canvasContext.fillText('Please Wait',300,300);
+            reloadMiniMap();
+        } else {
+            canvas.style.opacity = "1";
         if (whereAmI === 'Menu') {
             menuHandler();
         } else if(whereAmI === 'FightMenu'){
@@ -206,12 +219,10 @@
             toMap();
         } else if (whereAmI === 'Fight') {
             fightHandler(myPlayer, myEnemy);
-        } else if (whereAmI === 'Wait') {
-            canvasContext.font="20px Georgia";
-            canvasContext.fillStyle = "#000000";
-            canvasContext.fillText('Please Wait',300,300);
-            reloadMiniMap();
-        }
+        } else if (whereAmI === 'Supervisor'){
+            console.log('lol');
+            toMap();
+        }}
     }, 1000 / 60);
 
     canvas.onmousemove = function (event) {

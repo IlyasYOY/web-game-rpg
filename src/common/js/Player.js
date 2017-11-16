@@ -45,7 +45,7 @@ var rangeOfWalking = function(player,i,j){
   let maxSumSpeed = 100;
   let ratio = 50;
   let distance = parseInt((player.units.warrior*(maxSumSpeed/typesOfUnit['warrior'].speed) + player.units.magician*(maxSumSpeed/typesOfUnit['magician'].speed))/ratio);
-    return Math.abs(player.x - i) <= distance && Math.abs(player.y - j) <= distance;
+    return (Math.abs(player.x - i) + Math.abs(player.y - j)) <= distance;
 };
 
 module.exports.Entity = Entity;

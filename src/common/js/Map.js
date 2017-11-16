@@ -43,5 +43,5 @@ var fogOfWar = function(player,i,j){
     let distance = 3;
     let ratio = 50;
     distance += parseInt((player.units.warrior*typesOfUnit['warrior'].intelegente + player.units.magician*typesOfUnit['magician'].intelegente)/ratio);
-    return Math.abs(player.x - i) <= distance && Math.abs(player.y - j) <= distance;
+    return (Math.abs(player.x - i) + Math.abs(player.y - j)) <= distance;
 };
