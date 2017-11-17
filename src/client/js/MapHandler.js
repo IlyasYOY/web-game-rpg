@@ -103,6 +103,8 @@ var reloadMiniMap = function () {
     }
 };
 
+
+
 var reloadMainMap = function () {
     for (let i = camera.startX;i<map.numberOfCell;++i){
         for (let j = camera.startY;j<map.numberOfCell;++j){
