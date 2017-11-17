@@ -39,31 +39,34 @@ var cuHandler = function (me) {
     }
 };
 
-var drawWarrior = function(positionX,positionY){
+var drawWarrior = function(positionX,positionY,number){
+    canvasContext.font="14px Georgia";
+    canvasContext.fillStyle = '#000000';
+    canvasContext.fillText(number, 0 + positionX, 5 + positionY);
     //head
     canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(25 + positionX,0 + positionY,25,25);
+    canvasContext.fillRect(25 + positionX,5 + positionY,25,25);
     //body
     canvasContext.fillStyle = '#ff2b23';
-    canvasContext.fillRect(12.5 + positionX,25 + positionY,50,50);
+    canvasContext.fillRect(12.5 + positionX,30 + positionY,50,50);
     //left arm
     canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(0 + positionX,25 + positionY,12.5,25);
+    canvasContext.fillRect(0 + positionX,30 + positionY,12.5,25);
     //right arm
     canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(62.5 + positionX,25 + positionY,12.5,25);
+    canvasContext.fillRect(62.5 + positionX,30 + positionY,12.5,25);
     //left foot
     canvasContext.fillStyle = '#0f0aff';
-    canvasContext.fillRect(15 + positionX,75 + positionY,12.5,25);
+    canvasContext.fillRect(15 + positionX,80 + positionY,12.5,25);
     //right foot
     canvasContext.fillStyle = '#0f0aff';
-    canvasContext.fillRect(45 + positionX,75 + positionY,12.5,25);
+    canvasContext.fillRect(45 + positionX,80 + positionY,12.5,25);
 };
 
 var drawMagician = function(positionX,positionY,number){
     canvasContext.font="14px Georgia";
     canvasContext.fillStyle = '#000000';
-    canvasContext.fillText(number, 15 + positionX, 5 + positionY);
+    canvasContext.fillText(number, 0 + positionX, 5 + positionY);
     //hat
     canvasContext.fillStyle = '#000000';
     canvasContext.fillRect(20 + positionX,5 + positionY,35,5);
@@ -113,8 +116,17 @@ var drawMyPerson = function () {
             drawMagician(50,375,myPerson.units[i]);
         }
     }
+};
 
-
+var drawMyEnemy = function (myEnemy) {
+    let health = 0;
+    for (let i in players[myEnemy].units){
+        if (i === 'warrior'){
+            drawWarrior(400,250,myPerson.units[i]);
+        } else if(i === 'magician'){
+            drawMagician(400,375,myPerson.units[i]);
+        }
+    }
 };
 
 
@@ -138,7 +150,7 @@ var fightHandler = function (myEnemy) {
     whereAmI = 'Fight';
     writeStat(myEnemy);
     drawMyPerson();
-    // drawWarrior(400,250);
+    drawMyEnemy(myEnemy);
     // drawSkills(stroke);
     // cuHandler(me);
     // doAttack();
