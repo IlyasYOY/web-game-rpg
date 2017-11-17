@@ -1,3 +1,8 @@
+let clickedSkills = {
+    x: -1,
+    y: -1,
+    isDoubleClick : false
+};
 var kickAnimation = function () {
     canvasContext.font = "20px Georgia";
     canvasContext.fillText('Na nahuy! ', 250, 80);
@@ -7,10 +12,10 @@ var kickAnimation = function () {
     }
 };
  var doAttack = function () {
-    if (clickedSells.x !== -1 && clickedSells.y !== -1) {
+    if (clickedSkills.x !== -1 && clickedSkills.y !== -1) {
         kickAnimation();
-        clickedSells.x = -1;
-        clickedSells.y = -1;
+        clickedSkills.x = -1;
+        clickedSkills.y = -1;
     }
 };
 
@@ -25,13 +30,13 @@ var cuHandler = function (numbOfSkills) {
        for(let j = 0;j<numbOfSkills;++j)
         if (isInSquare(j % 5, j / 5, 40, mauseCoord.x - canvasHeight, mauseCoord.y - miniMapWidth)) {
             if (mauseCoord.isDown === true) {
-                clickedSells.x = parseInt(j % 5);
-                clickedSells.y = parseInt(j / 5);
+                clickedSkills.x = parseInt(j % 5);
+                clickedSkills.y = parseInt(j / 5);
                 mauseCoord.isDown = false;
             }
         }
     inventoryContext.fillStroke = "#000000";
-    inventoryContext.strokeRect((clickedSells.x * 40) % 200, clickedSells.y * 40, 40, 40);
+    inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
 };
 
 var drawWarrior = function(positionX,positionY,number){
