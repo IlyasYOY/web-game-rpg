@@ -5,17 +5,10 @@ let express = require('express');
 let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
-
+let isEnterable = require('../../common/js/Map').isEnterable;
 
 let port = process.env.PORT || 8080;
 let ip = "127.0.0.1";
-let playersLimit = 2;
-
-
-function getRandomInt(min, max) {
-    return Math.floor(Math.random() * (max - min)) + min;
-}
-
 
 module.exports = function startServer(dir) {
     app.use(express.static(path.join(dir, "/src")));
@@ -23,19 +16,37 @@ module.exports = function startServer(dir) {
         res.sendFile(path.join(dir, "/src/client/html/index.html"));
     });
 
+    let utils = {
+        playersLimit: 2,
+        getRandomInt(min, max) {
+            return Math.floor(Math.random() * (max - min)) + min;
+        },
+        getPlayers() {
+            let players = {};
+            let sockets = io.sockets.connected;
+
+            for (let id in sockets) {
+                players[sockets[id].id] = sockets[id].player;
+            }
+
+            return players;
+        }
+    };
+
     let mapHandler = {
         mapNames: [],
         currentMapNumber: 0,
         currentMap: null,
-        getMaps: function () {
+        getMaps() {
             this.mapNames = fs.readdirSync(path.join(dir, "/src/server/js/json"));
+            this.currentMap = JSON.parse(fs.readFileSync(path.join(dir, "/src/server/js/json", this.mapNames[this.currentMapNumber])));
         },
-        nextMap: function () {
+        nextMap() {
             this.currentMapNumber++;
             this.currentMapNumber %= this.mapNames.length;
             this.currentMap = null;
         },
-        loadCurrentMap: function (s) {
+        loadCurrentMap(s) {
             if (this.currentMap == null) {
                 fs.readFile(path.join(dir, "/src/server/js/json", this.mapNames[this.currentMapNumber]), function (err, buffer) {
                     if (err) {
@@ -45,81 +56,93 @@ module.exports = function startServer(dir) {
                     if (s) {
                         s.emit("get_map", str);
                     }
-                    mapHandler.currentMap = str;
+                    mapHandler.currentMap = JSON.parse(str);
                 });
             } else {
-                s.emit("get_map", mapHandler.currentMap);
+                if (s) {
+                    s.emit("get_map", JSON.stringify(mapHandler.currentMap));
+                }
             }
         }
-    }
+    };
     mapHandler.getMaps();
     mapHandler.loadCurrentMap();
+
     let moveHandler = {
         moveQueue: [],
         step: 0,
-        getCurrent: function () {
+        getCurrent() {
             return this.moveQueue[this.step];
         },
-        getNewPlayer: function () {
-            // TODO.
+        createNewPlayer() {
+            let size = mapHandler.currentMap.numberOfCell;
+            let x, y;
+            let sockets = io.sockets.connected;
+            let search = true;
+            while (search) {
+                x = utils.getRandomInt(0, size);
+                y = utils.getRandomInt(0, size);
+                if (!isEnterable(mapHandler.currentMap, x, y)) {
+                    continue;
+                }
+                for (let id of this.moveQueue) {
+                    if (sockets[id].player.x == x && sockets[id].player.y == y) {
+                        continue;
+                    }
+                }
+                search = false;
+            }
+            return new Player(x, y, 0);
         },
-        nextMove: function () {
+        nextMove() {
             this.step++;
             this.step %= this.moveQueue.length;
         }
     };
-    let currentMapName = "map1";
 
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
-        if (moveHandler.moveQueue.length < playersLimit) {
-            socket.player = new Player(0, 0, 0, 10);
+
+        if (moveHandler.moveQueue.length < utils.playersLimit) {
+            console.log("This is new player.");
+            socket.player = moveHandler.createNewPlayer();
             moveHandler.moveQueue.push(socket.id);
             socket.emit("game_stage", {
                 "stage": "Wait"
             });
-            if (moveHandler.moveQueue.length === playersLimit) {
+            if (moveHandler.moveQueue.length === utils.playersLimit) {
                 io.emit("who_moves", moveHandler.getCurrent());
             }
         } else {
-            console.log(moveHandler.moveQueue.length);
+            console.log("This is new Supervisor.");
             socket.emit("game_stage", {
                 "stage": "Supervisor"
             });
         }
         socket.emit("get_player", socket.player);
-        socket.on("emit_get_map", function(data) {
-            fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
-                if (err) {
-                    throw err;
-                }
-                socket.emit("get_map", buffer.toString());
-            });
+        socket.on("emit_get_map", function (data) {
+            mapHandler.loadCurrentMap(socket);
         });
 
         socket.on("emit_get_players", function () {
-            socket.emit("get_players", getPlayers());
+            socket.emit("get_players", utils.getPlayers());
         });
 
-        socket.on("fight",function (myEnemy) {
-           socket.emit("game_stage",{
-               "stage": "Fight",
-               "from": myEnemy
-           });
+        socket.on("fight", function (myEnemy) {
+            socket.emit("game_stage", {
+                "stage": "Fight",
+                "from": myEnemy
+            });
 
-            let sockets = io.sockets.connected;
-
-            for (let i in sockets)
-                if (sockets[i].id == myEnemy){
-                    sockets[i].emit("game_stage",{
+            for (let id of moveHandler.moveQueue)
+                if (id == myEnemy) {
+                    io.sockets.connected[id].emit("game_stage", {
                         "stage": "Fight",
                         "from": socket.id
                     });
                     break;
                 }
-
         });
-
 
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
@@ -131,24 +154,24 @@ module.exports = function startServer(dir) {
             socket.player.y = step.y;
 
             let sockets = io.sockets.connected;
-            let flag = true;
+            let isCarrying = true;
 
-            for (let j in sockets) {
-                if (sockets[j].player !== undefined) {
-                    if (socket.id !== sockets[j].id && sockets[j].player.x === socket.player.x && sockets[j].player.y === socket.player.y) {
-                        flag = false;
+            for (let i in sockets) {
+                if (sockets[i].player !== undefined) {
+                    if (socket.id !== sockets[i].id && sockets[i].player.x === socket.player.x && sockets[i].player.y === socket.player.y) {
+                        isCarrying = false;
                         socket.emit("game_stage", {
                             "stage": "Wait",
-                            "from": sockets[j].id
+                            "from": sockets[i].id
                         });
-                        sockets[j].emit("game_stage", {
+                        sockets[i].emit("game_stage", {
                             "stage": "FightMenu",
                             "from": socket.id
                         });
                     }
                 }
             }
-            if (flag) {
+            if (isCarrying) {
                 moveHandler.nextMove();
                 io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
             }
@@ -163,20 +186,8 @@ module.exports = function startServer(dir) {
         });
     });
 
+
+    http.listen(port, function () {
+        console.log(`Server works on http://${ip}:${port}/`);
+    });
 };
-
-http.listen(port, function () {
-    console.log(`Server works on http://${ip}:${port}/`);
-});
-
-
-function getPlayers() {
-    let players = {};
-
-    var sockets = io.sockets.connected;
-
-    for (var i in sockets)
-        players[sockets[i].id] = sockets[i].player;
-
-    return players;
-}
