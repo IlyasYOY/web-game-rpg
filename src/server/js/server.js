@@ -42,7 +42,9 @@ module.exports = function startServer(dir) {
                         throw err;
                     }
                     const str = buffer.toString();
-                    s.emit("get_map", str);
+                    if (s) {
+                        s.emit("get_map", str);
+                    }
                     mapHandler.currentMap = str;
                 });
             } else {
