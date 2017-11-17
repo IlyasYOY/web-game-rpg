@@ -107,7 +107,6 @@
 
 
     let whereAmI = 'Wait';
-    let myPlayer = 0;
     let myEnemy = -1;
 
     let canvasWidth = 600;
@@ -172,6 +171,8 @@
         players = mPlayers;
     });
 
+    socket.emit("emit_get_map");
+
 
     socket.on("get_map",function (mMap) {
         console.log(mMap);
@@ -218,7 +219,7 @@
         } else if (whereAmI === 'Map') {
             toMap();
         } else if (whereAmI === 'Fight') {
-            fightHandler(myPlayer, myEnemy);
+            fightHandler(myEnemy);
         } else if (whereAmI === 'Supervisor'){
             console.log('lol');
             toMap();
