@@ -6,9 +6,16 @@ let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 
+
 let port = process.env.PORT || 8080;
 let ip = "127.0.0.1";
 let playersLimit = 2;
+
+
+function getRandomInt(min, max) {
+    return Math.floor(Math.random() * (max - min)) + min;
+}
+
 
 module.exports = function startServer(dir) {
     app.use(express.static(path.join(dir, "/src")));
@@ -16,6 +23,35 @@ module.exports = function startServer(dir) {
         res.sendFile(path.join(dir, "/src/client/html/index.html"));
     });
 
+    let mapHandler = {
+        mapNames: [],
+        currentMapNumber: 0,
+        currentMap: null,
+        getMaps: function () {
+            this.mapNames = fs.readdirSync(path.join(dir, "/src/server/js/json"));
+        },
+        nextMap: function () {
+            this.currentMapNumber++;
+            this.currentMapNumber %= this.mapNames.length;
+            this.currentMap = null;
+        },
+        loadCurrentMap: function (s) {
+            if (this.currentMap == null) {
+                fs.readFile(path.join(dir, "/src/server/js/json", this.mapNames[this.currentMapNumber]), function (err, buffer) {
+                    if (err) {
+                        throw err;
+                    }
+                    const str = buffer.toString();
+                    s.emit("get_map", str);
+                    mapHandler.currentMap = str;
+                });
+            } else {
+                s.emit("get_map", mapHandler.currentMap);
+            }
+        }
+    }
+    mapHandler.getMaps();
+    mapHandler.loadCurrentMap();
     let moveHandler = {
         moveQueue: [],
         step: 0,
@@ -23,9 +59,7 @@ module.exports = function startServer(dir) {
             return this.moveQueue[this.step];
         },
         getNewPlayer: function () {
-            for (let id in this.moveQueue) {
-                
-            }
+            // TODO.
         },
         nextMove: function () {
             this.step++;
@@ -52,11 +86,13 @@ module.exports = function startServer(dir) {
             });
         }
         socket.emit("get_player", socket.player);
-        fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
-            if (err) {
-                throw err;
-            }
-            socket.emit("get_map", buffer.toString());
+        socket.on("emit_get_map", function(data) {
+            fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
+                if (err) {
+                    throw err;
+                }
+                socket.emit("get_map", buffer.toString());
+            });
         });
 
         socket.on("emit_get_players", function () {
