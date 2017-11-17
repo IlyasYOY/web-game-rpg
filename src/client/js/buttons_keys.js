@@ -14,10 +14,8 @@ var keysPushed = {};
 
 var setKeyPush = function (keyCode) {
     keysPushed[keyCode] = true;
-    console.log("added")
 };
 
 var setKeyUp = function(keyCode){
     keysPushed[keyCode] = false;
-    console.log("deleted");
 };

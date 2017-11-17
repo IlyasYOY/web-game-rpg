@@ -148,7 +148,8 @@
 
     let clickedSells = {
         x: -1,
-        y: -1
+        y: -1,
+        isDoubleClick : false
     };
 
 //    var playerOne = new Player(0, 0, 0, 10);
@@ -219,9 +220,10 @@
         } else if (whereAmI === 'Map') {
             toMap();
         } else if (whereAmI === 'Fight') {
+            reloadMiniMap();
             fightHandler(myEnemy);
         } else if (whereAmI === 'Supervisor'){
-            console.log('lol');
+            reloadMiniMapForSuperVisor();
             toMap();
         }}
     }, 1000 / 60);

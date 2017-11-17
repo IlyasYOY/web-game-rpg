@@ -1,3 +1,8 @@
+let clickedSkills = {
+    x: -1,
+    y: -1,
+    isDoubleClick : false
+};
 var kickAnimation = function () {
     canvasContext.font = "20px Georgia";
     canvasContext.fillText('Na nahuy! ', 250, 80);
@@ -7,10 +12,10 @@ var kickAnimation = function () {
     }
 };
  var doAttack = function () {
-    if (clickedSells.x !== -1 && clickedSells.y !== -1) {
+    if (clickedSkills.x !== -1 && clickedSkills.y !== -1) {
         kickAnimation();
-        clickedSells.x = -1;
-        clickedSells.y = -1;
+        clickedSkills.x = -1;
+        clickedSkills.y = -1;
     }
 };
 
@@ -21,49 +26,47 @@ var isInSquare = function(i,j,sizeOfCell,x,y){
         && y <= (j * (sizeOfCell) + sizeOfCell);
 };
 
-var cuHandler = function (me) {
-    var i = 0;
-    var k = -1;
-    for (key in players[me].skills) {
-        if (i % 5 === 0) ++k;
-        if (isInSquare(i, k, 40, mauseCoord.x - canvasHeight, mauseCoord.y - miniMapWidth)) {
+var cuHandler = function (numbOfSkills) {
+       for(let j = 0;j<numbOfSkills;++j)
+        if (isInSquare(j % 5, j / 5, 40, mauseCoord.x - canvasHeight, mauseCoord.y - miniMapWidth)) {
             if (mauseCoord.isDown === true) {
-                clickedSells.x = i;
-                clickedSells.y = k;
+                clickedSkills.x = parseInt(j % 5);
+                clickedSkills.y = parseInt(j / 5);
                 mauseCoord.isDown = false;
             }
         }
-        ++i;
-        inventoryContext.fillStroke = "#000000";
-        inventoryContext.strokeRect((clickedSells.x * 40) % 200, clickedSells.y * 40, 40, 40);
-    }
+    inventoryContext.fillStroke = "#000000";
+    inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
 };
 
-var drawWarrior = function(positionX,positionY){
+var drawWarrior = function(positionX,positionY,number){
+    canvasContext.font="14px Georgia";
+    canvasContext.fillStyle = '#000000';
+    canvasContext.fillText(number, 0 + positionX, 5 + positionY);
     //head
     canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(25 + positionX,0 + positionY,25,25);
+    canvasContext.fillRect(25 + positionX,5 + positionY,25,25);
     //body
     canvasContext.fillStyle = '#ff2b23';
-    canvasContext.fillRect(12.5 + positionX,25 + positionY,50,50);
+    canvasContext.fillRect(12.5 + positionX,30 + positionY,50,50);
     //left arm
     canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(0 + positionX,25 + positionY,12.5,25);
+    canvasContext.fillRect(0 + positionX,30 + positionY,12.5,25);
     //right arm
     canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(62.5 + positionX,25 + positionY,12.5,25);
+    canvasContext.fillRect(62.5 + positionX,30 + positionY,12.5,25);
     //left foot
     canvasContext.fillStyle = '#0f0aff';
-    canvasContext.fillRect(15 + positionX,75 + positionY,12.5,25);
+    canvasContext.fillRect(15 + positionX,80 + positionY,12.5,25);
     //right foot
     canvasContext.fillStyle = '#0f0aff';
-    canvasContext.fillRect(45 + positionX,75 + positionY,12.5,25);
+    canvasContext.fillRect(45 + positionX,80 + positionY,12.5,25);
 };
 
 var drawMagician = function(positionX,positionY,number){
     canvasContext.font="14px Georgia";
     canvasContext.fillStyle = '#000000';
-    canvasContext.fillText(number, 15 + positionX, 5 + positionY);
+    canvasContext.fillText(number, 0 + positionX, 5 + positionY);
     //hat
     canvasContext.fillStyle = '#000000';
     canvasContext.fillRect(20 + positionX,5 + positionY,35,5);
@@ -113,33 +116,79 @@ var drawMyPerson = function () {
             drawMagician(50,375,myPerson.units[i]);
         }
     }
+};
 
-
+var drawMyEnemy = function (myEnemy) {
+    let health = 0;
+    for (let i in players[myEnemy].units){
+        if (i === 'warrior'){
+            drawWarrior(400,250,myPerson.units[i]);
+        } else if(i === 'magician'){
+            drawMagician(400,375,myPerson.units[i]);
+        }
+    }
 };
 
 
-var drawSkills = function (me) {
+var drawMyPersonSkills = function () {
     inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
     var i = 0;
     var k = -1;
-    for (key in players[me].skills){
+    for (let key in myPerson.units){
         if (i%5 === 0) ++k;
-        if (key === 'fireball'){
+        if (key === 'warrior'){
             inventoryContext.fillStyle = "#ff1a27";}
-        else if(key === 'heal'){
-            inventoryContext.fillStyle = "#ffc550";
+        else if(key === 'magician'){
+            inventoryContext.fillStyle = "#1d21ff";
         }
         inventoryContext.fillRect((i * 40) % 200,k*40,40,40);
         ++i;
     }
+
+    for (let key in myPerson.inventory){
+        if (i%5 === 0) ++k;
+        if (key === 'fireball'){
+            inventoryContext.fillStyle = "#fffb17";}
+        else if(key === 'heal'){
+            inventoryContext.fillStyle = "#1eff1a";
+        }
+        inventoryContext.fillRect(((i%5) * 40) % 200,(i/5)*40,40,40);
+        ++i;
+    }
+    return i;
+};
+
+var drawMyEnemySkills = function (myEnemy) {
+    inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
+    var i = 0;
+    for (let key in players[myEnemy].units){
+        if (key === 'warrior'){
+            inventoryContext.fillStyle = "#ff1a27";}
+        else if(key === 'magician'){
+            inventoryContext.fillStyle = "#1d21ff";
+        }
+        inventoryContext.fillRect(((i%5) * 40) % 200,(i/5)*40,40,40);
+        ++i;
+    }
+
+    for (let key in players[myEnemy].inventory){
+        if (key === 'fireball'){
+            inventoryContext.fillStyle = "#fffb17";}
+        else if(key === 'heal'){
+            inventoryContext.fillStyle = "#1eff1a";
+        }
+        inventoryContext.fillRect(((i%5) * 40) % 200,(i/5)*40,40,40);
+        ++i;
+    }
+
+    return i;
 };
 
 var fightHandler = function (myEnemy) {
     whereAmI = 'Fight';
     writeStat(myEnemy);
     drawMyPerson();
-    // drawWarrior(400,250);
-    // drawSkills(stroke);
-    // cuHandler(me);
+    drawMyEnemy(myEnemy);
+    cuHandler(drawMyPersonSkills());
     // doAttack();
 };

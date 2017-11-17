@@ -17,46 +17,29 @@ var cursorHandler = function (i,j) {
 
         canvasContext.fillStyle = '#000000';
         if (mauseCoord.isDown === true){
+            console.log(clickedSells);
+            if (clickedSells.x === i && clickedSells.y === j){
+                clickedSells.isDoubleClick = true;
+            } else {
             clickedSells.x = i;
             clickedSells.y = j;
+            clickedSells.isDoubleClick = false;
+            }
             mauseCoord.isDown = false;
-            if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight){
-                myPerson.x = i;
-                myPerson.y = j;
-                reloadMiniMap();
-                socket.emit('do_step',{'x' : i,'y' : j});
-                socket.emit("emit_get_player");
-                // myPerson.x = i;
-                // myPerson.y = j;
-                // for (var k = 0;k<players.length;++k){
-                //     if (players[k].x === players[myPlayer].x &&
-                //         players[k].y === players[myPlayer].y &&
-                //         k!==myPlayer){
-                //         clickedSells.x = -1;
-                //         clickedSells.y = -1;
-                //         myEnemy = k;
-                //         whereAmI = 'FightMenu';
-                    }
+            if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight) {
+                if (clickedSells.isDoubleClick) {
+                    myPerson.x = i;
+                    myPerson.y = j;
+                    reloadMiniMap();
+                    socket.emit('do_step', {'x': i, 'y': j});
+                    socket.emit("emit_get_player");
                 }
             }
-        };
-
-    // if (isInSquare(i,j,miniMapHeight/map.getNumberOfCell(),mauseCoord.x - canvasHeight,mauseCoord.y)){
-    //     console.log(i + " / " + j);
-    //     miniMapContext.fillStyle = '#ffffff';
-    //     miniMapContext.fillRect((i) * miniMapHeight / map.getNumberOfCell(), (j) * miniMapHeight/map.getNumberOfCell(),
-    //                             miniMapHeight / map.getNumberOfCell(), miniMapHeight / map.getNumberOfCell());
-    //
-    //     if (mauseCoord.isDown === true) {
-    //         clickedSells.x = i;
-    //         clickedSells.y = j;
-    //         if (map.isEnterable(i,j) === true){
-    //         players[myPlayer].x = i;
-    //         players[myPlayer].y = j;
-    //         }
-    //     }
-    // }
-
+        }
+    }
+    canvasContext.strokeStyle = '#ffffff';
+    canvasContext.strokeRect((clickedSells.x-camera.startX)*(sizeOfCell),(clickedSells.y-camera.startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+};
 
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
@@ -92,11 +75,11 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
         canvasContext.strokeStyle = '#000000';
         //canvasContext.strokeRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell); }
         canvasContext.strokeRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell); }
-    else {
-        canvasContext.strokeStyle = '#ff1a27';
-        //canvasContext.strokeRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
-        canvasContext.strokeRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
-    }
+    // else {
+    //     canvasContext.strokeStyle = '#ff1a27';
+    //     //canvasContext.strokeRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
+    //     canvasContext.strokeRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+    // }
 };
 
 
@@ -119,6 +102,8 @@ var reloadMiniMap = function () {
         }
     }
 };
+
+
 
 var reloadMainMap = function () {
     for (let i = camera.startX;i<map.numberOfCell;++i){

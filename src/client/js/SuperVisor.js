@@ -42,4 +42,13 @@ var printMapForSuperVisor = function () {
 
 };
 
+var reloadMiniMapForSuperVisor = function () {
+    for (let i = 0;i<map.numberOfCell;++i){
+        for (let j = 0;j<map.numberOfCell;++j){
+            printCellForSuperVisor(i,j,0,0,miniMapHeight/map.numberOfCell,miniMapContext);
+            printPlayersForSuperVisor(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
+        }
+    }
+};
+
 
