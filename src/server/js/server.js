@@ -40,8 +40,7 @@ module.exports = function startServer(dir) {
             socket.player = new Player(0, 0, 0, 10);
             moveHandler.moveQueue.push(socket.id);
             socket.emit("game_stage", {
-                "stage": "Wait",
-                "from": -1
+                "stage": "Wait"
             });
             if (moveHandler.moveQueue.length === playersLimit) {
                 io.emit("who_moves", moveHandler.getCurrent());
@@ -49,8 +48,7 @@ module.exports = function startServer(dir) {
         } else {
             console.log(moveHandler.moveQueue.length);
             socket.emit("game_stage", {
-                "stage": "Supervisor",
-                "from": -1
+                "stage": "Supervisor"
             });
         }
         socket.emit("get_player", socket.player);
@@ -63,6 +61,25 @@ module.exports = function startServer(dir) {
 
         socket.on("emit_get_players", function () {
             socket.emit("get_players", getPlayers());
+        });
+
+        socket.on("fight",function (myEnemy) {
+           socket.emit("game_stage",{
+               "stage": "Fight",
+               "from": myEnemy
+           });
+
+            let sockets = io.sockets.connected;
+
+            for (let i in sockets)
+                if (sockets[i].id == myEnemy){
+                    sockets[i].emit("game_stage",{
+                        "stage": "Fight",
+                        "from": socket.id
+                    });
+                    break;
+                }
+
         });
 
 
