@@ -4,7 +4,8 @@
 -1 - вода
 3 - камень
 4 - гора
--2 - впадина*/
+-2 - впадина
+5 - npc-охранник*/
 class Map{
     constructor(numberOfCell = 0){
         this.numberOfCell = numberOfCell;

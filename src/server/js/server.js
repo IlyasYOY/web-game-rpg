@@ -67,24 +67,28 @@ module.exports = function startServer(dir) {
             socket.player.x = step.x;
             socket.player.y = step.y;
 
-            var sockets = io.sockets.connected;
+            let sockets = io.sockets.connected;
+            let flag = true;
 
-            for (let i in sockets) {
-                if (sockets.player !== undefined) {
-                    if (socket.id !== sockets[i].id && sockets[i].player.x == step.x && sockets[i].player.y == step.y) {
-                        socket.emit("game_stage", {
-                            "stage": "FightMenu",
-                            "from": socket.id
-                        });
+            for (let j in sockets) {
+                if (sockets[j].player !== undefined) {
+                    if (socket.id !== sockets[j].id && sockets[j].player.x === socket.player.x && sockets[j].player.y === socket.player.y) {
+                        flag = false;
                         socket.emit("game_stage", {
                             "stage": "Wait",
-                            "from": i.id
+                            "from": sockets[j].id
+                        });
+                        sockets[j].emit("game_stage", {
+                            "stage": "FightMenu",
+                            "from": socket.id
                         });
                     }
                 }
             }
-            moveHandler.nextMove();
-            io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
+            if (flag) {
+                moveHandler.nextMove();
+                io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
+            }
         });
 
         socket.on("fight", function(socketid) {
