@@ -46,3 +46,5 @@ var fogOfWar = function(player,i,j){
     distance += parseInt((player.units.warrior*typesOfUnit['warrior'].intelegente + player.units.magician*typesOfUnit['magician'].intelegente)/ratio);
     return (Math.abs(player.x - i) + Math.abs(player.y - j)) <= distance;
 };
+
+module.exports.isEnterable = isEnterable;
