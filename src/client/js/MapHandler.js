@@ -26,6 +26,8 @@ var cursorHandler = function (i,j) {
                 reloadMiniMap();
                 socket.emit('do_step',{'x' : i,'y' : j});
                 socket.emit("emit_get_player");
+                clickedSells.x = -1;
+                clickedSells.y = -1;
                 // myPerson.x = i;
                 // myPerson.y = j;
                 // for (var k = 0;k<players.length;++k){
