@@ -8,6 +8,7 @@ let io = require('socket.io')(http);
 
 let port = process.env.PORT || 8080;
 let ip = "127.0.0.1";
+let playersLimit = 2;
 
 module.exports = function startServer(dir) {
     app.use(express.static(path.join(dir, "/src")));
@@ -16,9 +17,17 @@ module.exports = function startServer(dir) {
     });
 
     let moveHandler = {
-        "moveQueue": [],
-        "step": 0,
-        "nextMove": function() {
+        moveQueue: [],
+        step: 0,
+        getCurrent: function () {
+            return this.moveQueue[this.step];
+        },
+        getNewPlayer: function () {
+            for (let id in this.moveQueue) {
+                
+            }
+        },
+        nextMove: function () {
             this.step++;
             this.step %= this.moveQueue.length;
         }
@@ -27,9 +36,16 @@ module.exports = function startServer(dir) {
 
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
-        if (moveHandler.moveQueue.length < 3){
-        socket.player = new Player(0, 0, 0, 10);
-        moveHandler.moveQueue.push(socket.id);
+        if (moveHandler.moveQueue.length < playersLimit) {
+            socket.player = new Player(0, 0, 0, 10);
+            moveHandler.moveQueue.push(socket.id);
+            socket.emit("game_stage", {
+                "stage": "Wait",
+                "from": -1
+            });
+            if (moveHandler.moveQueue.length === playersLimit) {
+                io.emit("who_moves", moveHandler.getCurrent());
+            }
         } else {
             console.log(moveHandler.moveQueue.length);
             socket.emit("game_stage", {
@@ -37,14 +53,6 @@ module.exports = function startServer(dir) {
                 "from": -1
             });
         }
-        if (moveHandler.moveQueue.length < 3){
-            console.log(moveHandler.moveQueue.length);
-            socket.emit("game_stage", {
-                "stage": "Wait",
-                "from": -1
-            });
-        } else if (moveHandler.moveQueue.length === 3)
-        { io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);}
         socket.emit("get_player", socket.player);
         fs.readFile(path.join(dir, "/src/server/js/json", `${currentMapName}.json`), function (err, buffer) {
             if (err) {
@@ -53,12 +61,12 @@ module.exports = function startServer(dir) {
             socket.emit("get_map", buffer.toString());
         });
 
-        socket.on("emit_get_players",function () {
+        socket.on("emit_get_players", function () {
             socket.emit("get_players", getPlayers());
         });
 
 
-        socket.on("emit_get_player",function () {
+        socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
         });
 
@@ -91,7 +99,7 @@ module.exports = function startServer(dir) {
             }
         });
 
-        socket.on("fight", function(socketid) {
+        socket.on("fight", function (socketid) {
 
         });
 
