@@ -156,14 +156,14 @@ module.exports = function startServer(dir) {
                 "stage": "Fight",
                 "from": myEnemy
             });
-            socket.emit("who_moves_fight", socket.id);
             for (let id of moveHandler.moveQueue)
                 if (id == myEnemy) {
                     io.sockets.connected[id].emit("game_stage", {
                         "stage": "Fight",
                         "from": socket.id
                     });
-                    io.sockets.connected[id].emit("who_moves_fight", socket.id);
+                    socket.emit("who_moves_fight", id);
+                    io.sockets.connected[id].emit("who_moves_fight", id);
                     break;
                 }
         });
