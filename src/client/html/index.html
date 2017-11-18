@@ -201,6 +201,10 @@
         console.log(whereAmI);
     });
 
+    socket.on("who_moves_fight", function (id) {
+        whoMoves = id;
+    });
+
     setInterval(function () {
 
         socket.emit("emit_get_players");

@@ -128,18 +128,30 @@ module.exports = function startServer(dir) {
             socket.emit("get_players", utils.getPlayers());
         });
 
+        socket.on("emit_who_moves_fight", function (who_moves_id,id_enemy) {
+            if (socket.id === who_moves_id){
+                socket.emit("who_moves_fight",id_enemy);
+                io.sockets.connected[id_enemy].emit("who_moves_fight",id_enemy);
+            } else {
+                io.sockets.connected[id_enemy].emit("who_moves_fight",socket.id);
+                socket.emit("who_moves_fight",socket.id);
+            }
+        });
+
         socket.on("fight", function (myEnemy) {
+
             socket.emit("game_stage", {
                 "stage": "Fight",
                 "from": myEnemy
             });
-
+            socket.emit("who_moves_fight", socket.id);
             for (let id of moveHandler.moveQueue)
                 if (id == myEnemy) {
                     io.sockets.connected[id].emit("game_stage", {
                         "stage": "Fight",
                         "from": socket.id
                     });
+                    io.sockets.connected[id].emit("who_moves_fight", socket.id);
                     break;
                 }
         });
@@ -147,6 +159,7 @@ module.exports = function startServer(dir) {
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
         });
+
 
         socket.on("do_step", function (step) {
 

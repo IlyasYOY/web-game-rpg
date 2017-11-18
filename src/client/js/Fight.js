@@ -1,3 +1,5 @@
+let whoMoves = 0;
+
 let enemyUnitsCoord = {
   'warrior' : {
       'x' : 400,
@@ -31,14 +33,14 @@ let myPersonUnitsCoord = {
 let clickedSkills = {
     x: -1,
     y: -1,
-    isDoubleClick : false
+    isClick : false
 };
 let clickedUnit = {
     x: -1,
     y: -1,
     heightUnit : -1,
     widthUnit : -1,
-    isDoubleClick : false
+    isClick : false
 };
 
 var kickAnimation = function () {
@@ -73,25 +75,20 @@ var cursorIsInUnit = function(i,j,sizeOfX,sizeOfY,x,y){
 
 var cursorHandlerForUnits = function (myEnemy) {
     console.log("units");
+    if (mauseCoord.isDown){
     for (let i in enemyUnitsCoord){
         console.log(enemyUnitsCoord[i]);
         if (cursorIsInUnit(enemyUnitsCoord[i].x,enemyUnitsCoord[i].y,enemyUnitsCoord[i].width,
                            enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y)){
-            if (mauseCoord.isDown){
-                if (clickedUnit.x === i && clickedUnit.y === j){
-                    clickedUnit.isDoubleClick = true;
-                } else {
                     clickedUnit.x = enemyUnitsCoord[i].x;
                     clickedUnit.y = enemyUnitsCoord[i].y;
                     clickedUnit.heightUnit = enemyUnitsCoord[i].height;
                     clickedUnit.widthUnit = enemyUnitsCoord[i].width;
-                    clickedUnit.isDoubleClick = false;
-                }
-                mauseCoord.isDown = false;
+                    clickedUnit.isClick = true;
             }
         }
+        mauseCoord.isDown = false;
     }
-
     canvasContext.fillStroke = "#000000";
     canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
     console.log("player");
@@ -103,6 +100,7 @@ var cursorHandlerForSkills = function (numbOfSkills) {
             if (mauseCoord.isDown === true) {
                 clickedSkills.x = parseInt(j % 5);
                 clickedSkills.y = parseInt(j / 5);
+                clickedSkills.isClick = true;
                 mauseCoord.isDown = false;
             }
         }
@@ -254,12 +252,30 @@ var drawMyEnemySkills = function (myEnemy) {
     return i;
 };
 
+var clearChose = function () {
+    clickedSkills.isClick = false;
+    clickedUnit.isClick = false;
+    clickedUnit.x = - 1;
+    clickedUnit.y = -1;
+    clickedUnit.widthUnit = -1;
+    clickedUnit.heightUnit = -1;
+    clickedSkills.x = -1;
+    clickedSkills.y = -1;
+};
+
 var fightHandler = function (myEnemy) {
-    whereAmI = 'Fight';
-    writeStat(myEnemy);
-    drawMyPerson();
-    drawMyEnemy(myEnemy);
-    cursorHandlerForSkills(drawMyPersonSkills());
-    cursorHandlerForUnits(myEnemy);
+    console.log(whoMoves);
+    if (whoMoves === socket.id) {
+        whereAmI = 'Fight';
+        writeStat(myEnemy);
+        drawMyPerson();
+        drawMyEnemy(myEnemy);
+        cursorHandlerForSkills(drawMyPersonSkills());
+        cursorHandlerForUnits(myEnemy);
+        if (clickedSkills.isClick && clickedUnit.isClick){
+            clearChose();
+            socket.emit("emit_who_moves_fight",whoMoves,myEnemy);
+        }
+    }
     // doAttack();
 };
