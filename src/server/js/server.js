@@ -146,8 +146,6 @@ module.exports = function startServer(dir) {
         socket.on("do_fight_step",function (myEnemyId,myEnemy) {
             io.sockets.connected[myEnemyId].player = myEnemy;
             --socket.player.energy;
-            console.log(myEnemyId);
-            console.log(io.sockets.connected[myEnemyId].player);
         });
 
         socket.on("fight", function (myEnemy) {
