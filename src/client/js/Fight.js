@@ -1,3 +1,33 @@
+let enemyUnitsCoord = {
+  'warrior' : {
+      'x' : 400,
+      'y' : 250,
+      'height' : 100,
+      'width' : 75
+  },
+  'magician' : {
+      'x' : 400,
+      'y' : 375,
+      'height' : 100,
+      'width' : 75
+  }
+};
+
+let myPersonUnitsCoord = {
+    'warrior' : {
+        'x' : 50,
+        'y' : 250,
+        'height' : 62.5,
+        'width' : 30
+    },
+    'magician' : {
+        'x' : 50,
+        'y' : 375,
+        'height' : 62.5,
+        'width' : 30
+    }
+};
+
 let clickedSkills = {
     x: -1,
     y: -1,
@@ -5,7 +35,7 @@ let clickedSkills = {
 };
 var kickAnimation = function () {
     canvasContext.font = "20px Georgia";
-    canvasContext.fillText('Na nahuy! ', 250, 80);
+    canvasContext.fillText('Kick', 250, 80);
     for (var i = 0;i<20;++i){
         canvasContext.clearRect(50+i,250,0,0);
         drawWarrior(50 + 20*i,250);
@@ -26,7 +56,28 @@ var isInSquare = function(i,j,sizeOfCell,x,y){
         && y <= (j * (sizeOfCell) + sizeOfCell);
 };
 
-var cuHandler = function (numbOfSkills) {
+var cursorIsInUnit = function(i,j,sizeOfX,sizeOfY,x,y){
+    return x >= i
+        && y >= j
+        && x <= (i  + sizeOfX)
+        && y <= (j + sizeOfY);
+};
+
+var cursorHandlerForUnits = function (myEnemy) {
+    console.log("units");
+    for (let i in enemyUnitsCoord){
+        console.log(enemyUnitsCoord[i]);
+        if (cursorIsInUnit(enemyUnitsCoord[i].x,enemyUnitsCoord[i].y,enemyUnitsCoord[i].width,
+                           enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y)){
+            canvasContext.fillStroke = "#000000";
+            canvasContext.strokeRect(enemyUnitsCoord[i].x, enemyUnitsCoord[i].y,enemyUnitsCoord[i].width, enemyUnitsCoord[i].height);
+            console.log("player");
+
+        }
+    }
+};
+
+var cursorHandlerForSkills = function (numbOfSkills) {
        for(let j = 0;j<numbOfSkills;++j)
         if (isInSquare(j % 5, j / 5, 40, mauseCoord.x - canvasHeight, mauseCoord.y - miniMapWidth)) {
             if (mauseCoord.isDown === true) {
@@ -98,7 +149,6 @@ var writeStat = function (myEnemy) {
     canvasContext.fillText('energy = ' + myPerson.energy, 0, 42);
     canvasContext.fillText('VS',0,56);
     canvasContext.fillText('Player #' + myEnemy + ' : ', 0, 70);
-    console.log('myEnemy' + players[myEnemy]);
     health = 0;
     for (let i in players[myEnemy].units){
         health += players[myEnemy].units[i] * typesOfUnit[i].health;
@@ -189,6 +239,7 @@ var fightHandler = function (myEnemy) {
     writeStat(myEnemy);
     drawMyPerson();
     drawMyEnemy(myEnemy);
-    cuHandler(drawMyPersonSkills());
+    cursorHandlerForSkills(drawMyPersonSkills());
+    cursorHandlerForUnits(myEnemy);
     // doAttack();
 };
