@@ -33,6 +33,14 @@ let clickedSkills = {
     y: -1,
     isDoubleClick : false
 };
+let clickedUnit = {
+    x: -1,
+    y: -1,
+    heightUnit : -1,
+    widthUnit : -1,
+    isDoubleClick : false
+};
+
 var kickAnimation = function () {
     canvasContext.font = "20px Georgia";
     canvasContext.fillText('Kick', 250, 80);
@@ -69,12 +77,24 @@ var cursorHandlerForUnits = function (myEnemy) {
         console.log(enemyUnitsCoord[i]);
         if (cursorIsInUnit(enemyUnitsCoord[i].x,enemyUnitsCoord[i].y,enemyUnitsCoord[i].width,
                            enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y)){
-            canvasContext.fillStroke = "#000000";
-            canvasContext.strokeRect(enemyUnitsCoord[i].x, enemyUnitsCoord[i].y,enemyUnitsCoord[i].width, enemyUnitsCoord[i].height);
-            console.log("player");
-
+            if (mauseCoord.isDown){
+                if (clickedUnit.x === i && clickedUnit.y === j){
+                    clickedUnit.isDoubleClick = true;
+                } else {
+                    clickedUnit.x = enemyUnitsCoord[i].x;
+                    clickedUnit.y = enemyUnitsCoord[i].y;
+                    clickedUnit.heightUnit = enemyUnitsCoord[i].height;
+                    clickedUnit.widthUnit = enemyUnitsCoord[i].width;
+                    clickedUnit.isDoubleClick = false;
+                }
+                mauseCoord.isDown = false;
+            }
         }
     }
+
+    canvasContext.fillStroke = "#000000";
+    canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
+    console.log("player");
 };
 
 var cursorHandlerForSkills = function (numbOfSkills) {
