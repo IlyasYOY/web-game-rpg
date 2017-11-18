@@ -166,12 +166,12 @@
 
     socket.on("get_player",function (player) {
         myPerson = player;
-//        camera.startX = player.x;
-//        camera.startY = player.y;
+        console.log(myPerson);
     });
 
     socket.on('get_players',function (mPlayers) {
         players = mPlayers;
+        console.log(players);
     });
 
     socket.emit("emit_get_map");

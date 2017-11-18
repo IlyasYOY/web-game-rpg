@@ -129,6 +129,11 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("emit_who_moves_fight", function (who_moves_id,id_enemy) {
+            socket.emit("get_players", utils.getPlayers());
+            socket.emit("get_player", socket.player);
+            io.sockets.connected[id_enemy].emit("get_players", utils.getPlayers());
+            io.sockets.connected[id_enemy].emit("get_player", io.sockets.connected[id_enemy].player);
+
             if (socket.id === who_moves_id){
                 socket.emit("who_moves_fight",id_enemy);
                 io.sockets.connected[id_enemy].emit("who_moves_fight",id_enemy);
@@ -136,6 +141,13 @@ module.exports = function startServer(dir) {
                 io.sockets.connected[id_enemy].emit("who_moves_fight",socket.id);
                 socket.emit("who_moves_fight",socket.id);
             }
+        });
+
+        socket.on("do_fight_step",function (myEnemyId,myEnemy) {
+            io.sockets.connected[myEnemyId].player = myEnemy;
+            --socket.player.energy;
+            console.log(myEnemyId);
+            console.log(io.sockets.connected[myEnemyId].player);
         });
 
         socket.on("fight", function (myEnemy) {

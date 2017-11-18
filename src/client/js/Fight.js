@@ -1,4 +1,12 @@
+let allSkills = {'fireball' : 200,
+    'heal' : 200 ,
+    'kick' : 20,
+    'armor' : 200,
+    'mag_kick' : 25};
+
 let whoMoves = 0;
+
+let skills = [];
 
 let enemyUnitsCoord = {
   'warrior' : {
@@ -33,14 +41,16 @@ let myPersonUnitsCoord = {
 let clickedSkills = {
     x: -1,
     y: -1,
-    isClick : false
+    isClick : false,
+    skill : ''
 };
 let clickedUnit = {
     x: -1,
     y: -1,
     heightUnit : -1,
     widthUnit : -1,
-    isClick : false
+    isClick : false,
+    unit : ''
 };
 
 var kickAnimation = function () {
@@ -51,12 +61,20 @@ var kickAnimation = function () {
         drawWarrior(50 + 20*i,250);
     }
 };
- var doAttack = function () {
-    if (clickedSkills.x !== -1 && clickedSkills.y !== -1) {
-        kickAnimation();
-        clickedSkills.x = -1;
-        clickedSkills.y = -1;
-    }
+ var doAttack = function (myEnemy) {
+    let damage = 0;
+
+            if (skills[clickedSkills.skill] === 'kick'){
+                damage += allSkills['kick'] * myPerson.units['warrior'];
+            } else if (skills[clickedSkills.skill] === 'mag_kick'){
+                damage += allSkills['mag_kick'] * myPerson.units['magician'];
+            } else {
+                damage += allSkills[skills[clickedSkills.skill]];
+            }
+
+    console.log(players);
+     players[myEnemy].units[clickedUnit.unit] -= damage / typesOfUnit[clickedUnit.unit].health;
+     socket.emit("do_fight_step",myEnemy,players[myEnemy]);
 };
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
@@ -74,12 +92,12 @@ var cursorIsInUnit = function(i,j,sizeOfX,sizeOfY,x,y){
 };
 
 var cursorHandlerForUnits = function (myEnemy) {
-    console.log("units");
     if (mauseCoord.isDown){
     for (let i in enemyUnitsCoord){
-        console.log(enemyUnitsCoord[i]);
         if (cursorIsInUnit(enemyUnitsCoord[i].x,enemyUnitsCoord[i].y,enemyUnitsCoord[i].width,
-                           enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y)){
+                           enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y) &&
+            players[myEnemy].units[i] > 0){
+                    clickedUnit.unit = i;
                     clickedUnit.x = enemyUnitsCoord[i].x;
                     clickedUnit.y = enemyUnitsCoord[i].y;
                     clickedUnit.heightUnit = enemyUnitsCoord[i].height;
@@ -91,13 +109,13 @@ var cursorHandlerForUnits = function (myEnemy) {
     }
     canvasContext.fillStroke = "#000000";
     canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
-    console.log("player");
 };
 
 var cursorHandlerForSkills = function (numbOfSkills) {
        for(let j = 0;j<numbOfSkills;++j)
         if (isInSquare(j % 5, j / 5, 40, mauseCoord.x - canvasHeight, mauseCoord.y - miniMapWidth)) {
             if (mauseCoord.isDown === true) {
+                clickedSkills.skill = j;
                 clickedSkills.x = parseInt(j % 5);
                 clickedSkills.y = parseInt(j / 5);
                 clickedSkills.isClick = true;
@@ -111,7 +129,7 @@ var cursorHandlerForSkills = function (numbOfSkills) {
 var drawWarrior = function(positionX,positionY,number){
     canvasContext.font="14px Georgia";
     canvasContext.fillStyle = '#000000';
-    canvasContext.fillText(number, 0 + positionX, 5 + positionY);
+    canvasContext.fillText(parseInt(number), 0 + positionX, 5 + positionY);
     //head
     canvasContext.fillStyle = '#ffe789';
     canvasContext.fillRect(25 + positionX,5 + positionY,25,25);
@@ -135,7 +153,7 @@ var drawWarrior = function(positionX,positionY,number){
 var drawMagician = function(positionX,positionY,number){
     canvasContext.font="14px Georgia";
     canvasContext.fillStyle = '#000000';
-    canvasContext.fillText(number, 0 + positionX, 5 + positionY);
+    canvasContext.fillText(parseInt(number), 0 + positionX, 5 + positionY);
     //hat
     canvasContext.fillStyle = '#000000';
     canvasContext.fillRect(20 + positionX,5 + positionY,35,5);
@@ -178,10 +196,12 @@ var writeStat = function (myEnemy) {
 var drawMyPerson = function () {
     let health = 0;
     for (let i in myPerson.units){
+        if (myPerson.units[i]>0) {
         if (i === 'warrior'){
             drawWarrior(50,250,myPerson.units[i]);
         } else if(i === 'magician'){
             drawMagician(50,375,myPerson.units[i]);
+        }
         }
     }
 };
@@ -189,68 +209,52 @@ var drawMyPerson = function () {
 var drawMyEnemy = function (myEnemy) {
     let health = 0;
     for (let i in players[myEnemy].units){
+        if (players[myEnemy].units[i]>0) {
         if (i === 'warrior'){
-            drawWarrior(400,250,myPerson.units[i]);
+            drawWarrior(400,250,players[myEnemy].units[i]);
         } else if(i === 'magician'){
-            drawMagician(400,375,myPerson.units[i]);
+            drawMagician(400,375,players[myEnemy].units[i]);
+        }
         }
     }
 };
 
 
-var drawMyPersonSkills = function () {
+var drawMySkills = function (myPerson) {
     inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
-    var i = 0;
-    var k = -1;
+    skills = [];
+    let i = 0;
+    let k = -1;
     for (let key in myPerson.units){
-        if (i%5 === 0) ++k;
-        if (key === 'warrior'){
-            inventoryContext.fillStyle = "#ff1a27";}
-        else if(key === 'magician'){
-            inventoryContext.fillStyle = "#1d21ff";
+        if (myPerson.units[key] > 0){
+            if (i%5 === 0) ++k;
+            if (key === 'warrior'){
+                skills.push('kick');
+                inventoryContext.fillStyle = "#ff1a27";}
+            else if(key === 'magician'){
+                skills.push('mag_kick');
+                inventoryContext.fillStyle = "#1d21ff";
+            }
+            inventoryContext.fillRect((i%5 * 40) % 200,k*40,40,40);
+            ++i;
         }
-        inventoryContext.fillRect((i * 40) % 200,k*40,40,40);
-        ++i;
     }
 
     for (let key in myPerson.inventory){
         if (i%5 === 0) ++k;
         if (key === 'fireball'){
+            skills.push('fireball');
             inventoryContext.fillStyle = "#fffb17";}
         else if(key === 'heal'){
+            skills.push('heal');
             inventoryContext.fillStyle = "#1eff1a";
         }
-        inventoryContext.fillRect(((i%5) * 40) % 200,(i/5)*40,40,40);
+        inventoryContext.fillRect(((i%5) * 40) % 200,k*40,40,40);
         ++i;
     }
     return i;
 };
 
-var drawMyEnemySkills = function (myEnemy) {
-    inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
-    var i = 0;
-    for (let key in players[myEnemy].units){
-        if (key === 'warrior'){
-            inventoryContext.fillStyle = "#ff1a27";}
-        else if(key === 'magician'){
-            inventoryContext.fillStyle = "#1d21ff";
-        }
-        inventoryContext.fillRect(((i%5) * 40) % 200,(i/5)*40,40,40);
-        ++i;
-    }
-
-    for (let key in players[myEnemy].inventory){
-        if (key === 'fireball'){
-            inventoryContext.fillStyle = "#fffb17";}
-        else if(key === 'heal'){
-            inventoryContext.fillStyle = "#1eff1a";
-        }
-        inventoryContext.fillRect(((i%5) * 40) % 200,(i/5)*40,40,40);
-        ++i;
-    }
-
-    return i;
-};
 
 var clearChose = function () {
     clickedSkills.isClick = false;
@@ -264,18 +268,18 @@ var clearChose = function () {
 };
 
 var fightHandler = function (myEnemy) {
-    console.log(whoMoves);
     if (whoMoves === socket.id) {
         whereAmI = 'Fight';
         writeStat(myEnemy);
         drawMyPerson();
         drawMyEnemy(myEnemy);
-        cursorHandlerForSkills(drawMyPersonSkills());
+        cursorHandlerForSkills(drawMySkills(myPerson));
         cursorHandlerForUnits(myEnemy);
         if (clickedSkills.isClick && clickedUnit.isClick){
             clearChose();
+            console.log(1);
+            doAttack(myEnemy);
             socket.emit("emit_who_moves_fight",whoMoves,myEnemy);
         }
     }
-    // doAttack();
 };

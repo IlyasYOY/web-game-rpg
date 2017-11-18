@@ -1,9 +1,8 @@
-var allSkills = ['fireball', 'heal', 'kick', 'armor'];
 
 typesOfUnit = {
     'magician' : {
         health : 80,
-        power : 5,
+        power : 10,
         speed : 5,
         luck : 15,
         intelegente : 10,
