@@ -23,6 +23,9 @@ var cursorHandler = function (i,j) {
             } else {
             clickedSells.x = i;
             clickedSells.y = j;
+            if (rangeOfWalking(myPerson, i, j) && isEnterable(map, i, j)) {
+                console.log(findPath(map, [myPerson.x, myPerson.y], [i, j]));
+            }
             clickedSells.isDoubleClick = false;
             }
             mauseCoord.isDown = false;
