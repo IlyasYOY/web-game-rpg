@@ -203,35 +203,40 @@ module.exports = function startServer(dir) {
         });
 
 
-        socket.on("do_step", function (step) {
+        socket.on("do_step", function (step,rangeOfStep) {
+            if (socket.player.distance >= rangeOfStep) {
+                console.log(rangeOfStep);
+                console.log(socket.player);
+                socket.player.distance -= rangeOfStep;
+                socket.player.x = step.x;
+                socket.player.y = step.y;
 
-            socket.player.x = step.x;
-            socket.player.y = step.y;
+                let sockets = io.sockets.connected;
+                let isCarrying = true;
 
-            let sockets = io.sockets.connected;
-            let isCarrying = true;
-
-            for (let i in sockets) {
-                if (sockets[i].player !== undefined) {
-                    if (socket.id !== sockets[i].id && sockets[i].player.x === socket.player.x && sockets[i].player.y === socket.player.y) {
-                        isCarrying = false;
-                        socket.emit("game_stage", {
-                            "stage": "Wait",
-                            "from": sockets[i].id
-                        });
-                        sockets[i].emit("game_stage", {
-                            "stage": "FightMenu",
-                            "from": socket.id
-                        });
+                for (let i in sockets) {
+                    if (sockets[i].player !== undefined) {
+                        if (socket.id !== sockets[i].id && sockets[i].player.x === socket.player.x && sockets[i].player.y === socket.player.y) {
+                            socket.player.distance = socket.player.maxDistance;
+                            isCarrying = false;
+                            socket.emit("game_stage", {
+                                "stage": "Wait",
+                                "from": sockets[i].id
+                            });
+                            sockets[i].emit("game_stage", {
+                                "stage": "FightMenu",
+                                "from": socket.id
+                            });
+                        }
                     }
                 }
+                if (isCarrying && socket.player.distance === 0) {
+                    socket.player.distance = socket.player.maxDistance;
+                    moveHandler.nextMove();
+                    io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
+                }
             }
-            if (isCarrying) {
-                moveHandler.nextMove();
-                io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
-            }
-        });
-
+       });
 
         socket.on("disconnect", function () {
             //...

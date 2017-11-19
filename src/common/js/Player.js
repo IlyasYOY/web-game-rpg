@@ -33,6 +33,8 @@ class Player extends Entity{
         this.units = {'warrior' : 5, 'magician' : 5};
         this.energy = energy;
         this.maxEnergy = energy;
+        this.maxDistance = energy;
+        this.distance = energy;
     }
 
     move(newX, newY) {

@@ -1,3 +1,16 @@
+var path = [];
+
+var printPath = function(array,startX,startY,sizeofCell,canvasContext){
+    if (myPerson.distance >= array.length){
+        canvasContext.strokeStyle = "#0aff00";
+    } else {
+        canvasContext.strokeStyle = "#ff342c";
+    }
+    for (let i in array) {
+            canvasContext.strokeRect((array[i][0] - startX) * (sizeOfCell), (array[i][1] - startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
+    }
+};
+
 var cursorHandler = function (i,j) {
     if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)){
         if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j)){
@@ -8,6 +21,7 @@ var cursorHandler = function (i,j) {
             miniMapContext.fillStyle = '#d7001d';
         }
         canvasContext.fillRect((i-camera.startX)*(sizeOfCell),(j-camera.startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+
 
         if (mauseCoord.x <= canvasHeight)
             miniMapContext.fillRect(i * miniMapHeight/map.numberOfCell,
@@ -24,18 +38,22 @@ var cursorHandler = function (i,j) {
             clickedSells.x = i;
             clickedSells.y = j;
             if (rangeOfWalking(myPerson, i, j) && isEnterable(map, i, j)) {
-                console.log(findPath(map, [myPerson.x, myPerson.y], [i, j]));
+                path = findPath(map, [myPerson.x, myPerson.y], [i, j]);
+                path.splice(0,1);
+            } else {
+                path = [];
             }
             clickedSells.isDoubleClick = false;
             }
             mauseCoord.isDown = false;
             if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight) {
-                if (clickedSells.isDoubleClick) {
+                if (clickedSells.isDoubleClick && myPerson.distance >= path.length) {
                     myPerson.x = i;
                     myPerson.y = j;
                     reloadMiniMap();
-                    socket.emit('do_step', {'x': i, 'y': j});
+                    socket.emit('do_step', {'x': i, 'y': j},path.length);
                     socket.emit("emit_get_player");
+                    path = [];
                 }
             }
         }
@@ -116,6 +134,7 @@ var reloadMainMap = function () {
 
         }
     }
+    printPath(path,camera.startX,camera.startY,sizeOfCell,canvasContext);
 
 };
 
