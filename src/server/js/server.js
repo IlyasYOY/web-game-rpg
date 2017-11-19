@@ -155,10 +155,21 @@ module.exports = function startServer(dir) {
 
         socket.on("do_fight_step",function (myEnemyId,myEnemy) {
             io.sockets.connected[myEnemyId].player = myEnemy;
-            --socket.player.energy;
+            socket.player.energy = socket.player.maxEnergy;
         });
 
         socket.on("end_of_fight",function (myEnemyId) {
+
+            // for (let i in io.sockets.connected[myEnemyId].player.inventory){
+            //     socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
+            // }
+            //
+            // for (let i of io.sockets.connected[myEnemyId].player.keys){
+            //     socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[i]);
+            // }
+
+            socket.player.energy = socket.player.maxEnergy;
+
             moveHandler.deletePlayer(myEnemyId);
             console.log(moveHandler);
             socket.emit("game_stage", {

@@ -29,8 +29,10 @@ class Player extends Entity{
         super(x,y,direction);
         this.rangeOfVisobility = 10;
         this.inventory = {};
+        this.keys = {};
         this.units = {'warrior' : 5, 'magician' : 5};
         this.energy = energy;
+        this.maxEnergy = energy;
     }
 
     move(newX, newY) {
