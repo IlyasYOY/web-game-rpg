@@ -30,14 +30,14 @@ let myPersonUnitsCoord = {
     'warrior' : {
         'x' : 50,
         'y' : 250,
-        'height' : 62.5,
-        'width' : 30
+        'height' : 100,
+        'width' : 75
     },
     'magician' : {
         'x' : 50,
         'y' : 375,
-        'height' : 62.5,
-        'width' : 30
+        'height' : 100,
+        'width' : 75
     }
 };
 
@@ -67,19 +67,19 @@ var kickAnimation = function () {
 var doAttack = function (myEnemy) {
     let damage = 0;
 
-    if (skills[clickedSkills.skill] === skillNames[0]){
+    if (skills[clickedSkills.skill] === skillNames[0] && myPerson.energy >= allSkills[skillNames[0]][1]){
         damage += allSkills[skillNames[0]][0] * myPerson.units['warrior'];
         myPerson.energy -= allSkills[skillNames[0]][1];
-    } else if (skills[clickedSkills.skill] === skillNames[1]){
+    } else if (skills[clickedSkills.skill] === skillNames[1] && myPerson.energy >= allSkills[skillNames[1]][1]){
         damage += allSkills[skillNames[1]][0] * myPerson.units['magician'];
         myPerson.energy -= allSkills[skillNames[1]][1];
-    } else {
+    } else if (myPerson.energy >= allSkills[skills[clickedSkills.skill]][0]){
         damage += allSkills[skills[clickedSkills.skill]][0];
         myPerson.energy -= allSkills[skills[clickedSkills.skill]][1];
     }
 
     players[myEnemy].units[clickedUnit.unit] -= damage / typesOfUnit[clickedUnit.unit].health;
-    socket.emit("do_fight_step",myEnemy,players[myEnemy]);
+    socket.emit("do_fight_step",myEnemy,players[myEnemy],myPerson.energy);
 };
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
@@ -102,6 +102,7 @@ var cursorHandlerForUnits = function (myEnemy) {
             if (cursorIsInUnit(enemyUnitsCoord[i].x,enemyUnitsCoord[i].y,enemyUnitsCoord[i].width,
                     enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y) &&
                 players[myEnemy].units[i] > 0){
+                socket.emit("emit_fight_chose_unit",i,myEnemy);
                 clickedUnit.unit = i;
                 clickedUnit.x = enemyUnitsCoord[i].x;
                 clickedUnit.y = enemyUnitsCoord[i].y;
@@ -124,6 +125,7 @@ var cursorHandlerForSkills = function (numbOfSkills) {
                 clickedSkills.x = parseInt(j % 5);
                 clickedSkills.y = parseInt(j / 5);
                 clickedSkills.isClick = true;
+                socket.emit("emit_fight_chose_skill",clickedSkills,myEnemy);
                 mauseCoord.isDown = false;
             }
         }
@@ -272,31 +274,51 @@ var clearChose = function () {
     clickedSkills.y = -1;
 };
 
+var fightGameStep = function (myEnemy) {
+    writeStat(myEnemy);
+    drawMyPerson();
+    drawMyEnemy(myEnemy);
+    cursorHandlerForSkills(drawMySkills(myPerson));
+    cursorHandlerForUnits(myEnemy);
+    if (clickedSkills.isClick && clickedUnit.isClick) {
+        clearChose();
+        socket.emit("emit_fight_attack_was_made",myEnemy);
+        doAttack(myEnemy);
+        let flag = false;
+        for (let i in players[myEnemy].units)
+            if (players[myEnemy].units[i] > 0) {
+                flag = true;
+                break;
+            }
+        if (!flag) {
+            socket.emit("end_of_fight", myEnemy);
+        }
+    }
+};
+
 var fightHandler = function (myEnemy) {
     if (whoMoves === socket.id) {
+        canvas.style.opacity = "1";
         whereAmI = 'Fight';
-        console.log(myPerson);
         if (myPerson.energy > 0) {
-            writeStat(myEnemy);
-            drawMyPerson();
-            drawMyEnemy(myEnemy);
-            cursorHandlerForSkills(drawMySkills(myPerson));
-            cursorHandlerForUnits(myEnemy);
-            if (clickedSkills.isClick && clickedUnit.isClick) {
-                clearChose();
-                doAttack(myEnemy);
-                let flag = false;
-                for (let i in players[myEnemy].units)
-                    if (players[myEnemy].units[i] > 0) {
-                        flag = true;
-                        break;
-                    }
-                if (!flag) {
-                    socket.emit("end_of_fight", myEnemy);
-                }
-            }
+            fightGameStep(myEnemy);
         }else {
             socket.emit("emit_who_moves_fight", whoMoves, myEnemy);
         }
+    } else {
+        canvas.style.opacity = "0.5";
+        canvasContext.font="20px Georgia";
+        canvasContext.fillStyle = "#000000";
+        canvasContext.fillText('Please Wait',250,300);
+        writeStat(myEnemy);
+        drawMyPerson();
+        drawMyEnemy(myEnemy);
+        drawMySkills(players[myEnemy]);
+        canvasContext.fillStroke = "#000000";
+        canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
+        inventoryContext.fillStroke = "#000000";
+        inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
+        socket.emit("emit_get_player");
+        socket.emit("emit_get_players");
     }
 };

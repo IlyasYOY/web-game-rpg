@@ -139,6 +139,7 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("emit_who_moves_fight", function (who_moves_id,id_enemy) {
+            socket.player.energy = socket.player.maxEnergy;
             socket.emit("get_players", utils.getPlayers());
             socket.emit("get_player", socket.player);
             io.sockets.connected[id_enemy].emit("get_players", utils.getPlayers());
@@ -153,9 +154,21 @@ module.exports = function startServer(dir) {
             }
         });
 
-        socket.on("do_fight_step",function (myEnemyId,myEnemy) {
+        socket.on("do_fight_step",function (myEnemyId,myEnemy,myEnergy) {
             io.sockets.connected[myEnemyId].player = myEnemy;
-            socket.player.energy = socket.player.maxEnergy;
+            socket.player.energy = myEnergy;
+        });
+
+        socket.on("emit_fight_chose_unit", function(i,myEnemy){
+            io.sockets.connected[myEnemy].emit("fight_chose_unit",i);
+        });
+
+        socket.on("emit_fight_chose_skill",function(clickedSkills,myEnemy){
+            io.sockets.connected[myEnemy].emit("fight_chose_skill",clickedSkills);
+        });
+
+        socket.on("emit_fight_attack_was_made",function (myEnemy) {
+            io.sockets.connected[myEnemy].emit("fight_attack_was_made");
         });
 
         socket.on("end_of_fight",function (myEnemyId) {
@@ -171,7 +184,6 @@ module.exports = function startServer(dir) {
             socket.player.energy = socket.player.maxEnergy;
 
             moveHandler.deletePlayer(myEnemyId);
-            console.log(moveHandler);
             socket.emit("game_stage", {
                 "stage": "Map"
             });
@@ -205,8 +217,6 @@ module.exports = function startServer(dir) {
 
         socket.on("do_step", function (step,rangeOfStep) {
             if (socket.player.distance >= rangeOfStep) {
-                console.log(rangeOfStep);
-                console.log(socket.player);
                 socket.player.distance -= rangeOfStep;
                 socket.player.x = step.x;
                 socket.player.y = step.y;
