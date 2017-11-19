@@ -97,6 +97,16 @@ module.exports = function startServer(dir) {
         nextMove() {
             this.step++;
             this.step %= this.moveQueue.length;
+        },
+        deletePlayer(id){
+            for (let i in this.moveQueue){
+                if (this.moveQueue[i] == id){
+                    this.moveQueue.splice(i,1);
+                    delete io.sockets.connected[id].player;
+                }
+            }
+            this.step++;
+            this.step %= this.moveQueue.length;
         }
     };
 
@@ -128,18 +138,62 @@ module.exports = function startServer(dir) {
             socket.emit("get_players", utils.getPlayers());
         });
 
+        socket.on("emit_who_moves_fight", function (who_moves_id,id_enemy) {
+            socket.emit("get_players", utils.getPlayers());
+            socket.emit("get_player", socket.player);
+            io.sockets.connected[id_enemy].emit("get_players", utils.getPlayers());
+            io.sockets.connected[id_enemy].emit("get_player", io.sockets.connected[id_enemy].player);
+
+            if (socket.id === who_moves_id){
+                socket.emit("who_moves_fight",id_enemy);
+                io.sockets.connected[id_enemy].emit("who_moves_fight",id_enemy);
+            } else {
+                io.sockets.connected[id_enemy].emit("who_moves_fight",socket.id);
+                socket.emit("who_moves_fight",socket.id);
+            }
+        });
+
+        socket.on("do_fight_step",function (myEnemyId,myEnemy) {
+            io.sockets.connected[myEnemyId].player = myEnemy;
+            socket.player.energy = socket.player.maxEnergy;
+        });
+
+        socket.on("end_of_fight",function (myEnemyId) {
+
+            // for (let i in io.sockets.connected[myEnemyId].player.inventory){
+            //     socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
+            // }
+            //
+            // for (let i of io.sockets.connected[myEnemyId].player.keys){
+            //     socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[i]);
+            // }
+
+            socket.player.energy = socket.player.maxEnergy;
+
+            moveHandler.deletePlayer(myEnemyId);
+            console.log(moveHandler);
+            socket.emit("game_stage", {
+                "stage": "Map"
+            });
+            io.sockets.connected[myEnemyId].emit("game_stage", {
+                "stage": "Supervisor"
+            });
+        });
+
         socket.on("fight", function (myEnemy) {
+
             socket.emit("game_stage", {
                 "stage": "Fight",
                 "from": myEnemy
             });
-
             for (let id of moveHandler.moveQueue)
                 if (id == myEnemy) {
                     io.sockets.connected[id].emit("game_stage", {
                         "stage": "Fight",
                         "from": socket.id
                     });
+                    socket.emit("who_moves_fight", id);
+                    io.sockets.connected[id].emit("who_moves_fight", id);
                     break;
                 }
         });
@@ -147,6 +201,7 @@ module.exports = function startServer(dir) {
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
         });
+
 
         socket.on("do_step", function (step) {
 
@@ -177,9 +232,6 @@ module.exports = function startServer(dir) {
             }
         });
 
-        socket.on("fight", function (socketid) {
-
-        });
 
         socket.on("disconnect", function () {
             //...
