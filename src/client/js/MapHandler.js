@@ -13,7 +13,7 @@ var printPath = function(array,startX,startY,sizeofCell,canvasContext){
 
 var cursorHandler = function (i,j) {
     if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)){
-        if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j)){
+        if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j)){
             canvasContext.fillStyle = '#ffffff';
             miniMapContext.fillStyle = '#ffffff';
         } else {
@@ -37,7 +37,7 @@ var cursorHandler = function (i,j) {
             } else {
             clickedSells.x = i;
             clickedSells.y = j;
-            if (rangeOfWalking(myPerson, i, j) && isEnterable(map, i, j)) {
+            if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j)) {
                 path = findPath(map, [myPerson.x, myPerson.y], [i, j]);
                 path.splice(0,1);
             } else {
@@ -46,7 +46,7 @@ var cursorHandler = function (i,j) {
             clickedSells.isDoubleClick = false;
             }
             mauseCoord.isDown = false;
-            if (rangeOfWalking(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight) {
+            if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight) {
                 if (clickedSells.isDoubleClick && myPerson.distance >= path.length) {
                     myPerson.x = i;
                     myPerson.y = j;

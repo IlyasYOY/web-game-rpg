@@ -33,8 +33,8 @@ class Player extends Entity{
         this.units = {'warrior' : 5, 'magician' : 5};
         this.energy = energy;
         this.maxEnergy = energy;
-        this.maxDistance = energy;
-        this.distance = energy;
+        this.maxDistance = parseInt((this.units.warrior*(100/typesOfUnit['warrior'].speed) + this.units.magician*(100/typesOfUnit['magician'].speed))/50);
+        this.distance = this.maxDistance;
     }
 
     move(newX, newY) {
@@ -43,13 +43,13 @@ class Player extends Entity{
     }
 }
 
-var rangeOfWalking = function(player,i,j){
-  // let distance = 10;
-  let maxSumSpeed = 100;
-  let ratio = 50;
-  let distance = parseInt((player.units.warrior*(maxSumSpeed/typesOfUnit['warrior'].speed) + player.units.magician*(maxSumSpeed/typesOfUnit['magician'].speed))/ratio);
-    return (Math.abs(player.x - i) + Math.abs(player.y - j)) <= distance;
-};
+// var rangeOfWalking = function(player,i,j){
+//   // let distance = 10;
+//   let maxSumSpeed = 100;
+//   let ratio = 50;
+//   let distance = parseInt((player.units.warrior*(maxSumSpeed/typesOfUnit['warrior'].speed) + player.units.magician*(maxSumSpeed/typesOfUnit['magician'].speed))/ratio);
+//     return (Math.abs(player.x - i) + Math.abs(player.y - j)) <= distance;
+// };
 
 module.exports.Entity = Entity;
 module.exports.Player = Player;
