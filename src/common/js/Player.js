@@ -33,8 +33,7 @@ class Player extends Entity{
         this.units = {'warrior' : 5, 'magician' : 5};
         this.energy = energy/5;
         this.maxEnergy = energy/5;
-        this.maxDistance = energy;
-        //= parseInt((this.units.warrior*(100/typesOfUnit['warrior'].speed) + this.units.magician*(100/typesOfUnit['magician'].speed))/50);
+        this.maxDistance = parseInt((this.units.warrior*(200/typesOfUnit['warrior'].speed) + this.units.magician*(200/typesOfUnit['magician'].speed))/50);
         this.distance = this.maxDistance;
     }
 
