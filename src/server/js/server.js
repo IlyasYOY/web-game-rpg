@@ -97,6 +97,16 @@ module.exports = function startServer(dir) {
         nextMove() {
             this.step++;
             this.step %= this.moveQueue.length;
+        },
+        deletePlayer(id){
+            for (let i in this.moveQueue){
+                if (this.moveQueue[i] == id){
+                    this.moveQueue.splice(i,1);
+                    delete io.sockets.connected[id].player;
+                }
+            }
+            this.step++;
+            this.step %= this.moveQueue.length;
         }
     };
 
@@ -146,6 +156,17 @@ module.exports = function startServer(dir) {
         socket.on("do_fight_step",function (myEnemyId,myEnemy) {
             io.sockets.connected[myEnemyId].player = myEnemy;
             --socket.player.energy;
+        });
+
+        socket.on("end_of_fight",function (myEnemyId) {
+            moveHandler.deletePlayer(myEnemyId);
+            console.log(moveHandler);
+            socket.emit("game_stage", {
+                "stage": "Map"
+            });
+            io.sockets.connected[myEnemyId].emit("game_stage", {
+                "stage": "Supervisor"
+            });
         });
 
         socket.on("fight", function (myEnemy) {
@@ -200,9 +221,6 @@ module.exports = function startServer(dir) {
             }
         });
 
-        socket.on("fight", function (socketid) {
-
-        });
 
         socket.on("disconnect", function () {
             //...

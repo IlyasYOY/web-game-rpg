@@ -279,7 +279,17 @@ var fightHandler = function (myEnemy) {
             clearChose();
             console.log(1);
             doAttack(myEnemy);
-            socket.emit("emit_who_moves_fight",whoMoves,myEnemy);
+            flag = false;
+            for (let i in players[myEnemy].units)
+                if (players[myEnemy].units[i] > 0){
+                    flag = true;
+                    break;
+                }
+            if (flag) {
+                socket.emit("emit_who_moves_fight", whoMoves, myEnemy);
+            } else {
+                socket.emit("end_of_fight",myEnemy);
+            }
         }
     }
 };
