@@ -7,8 +7,7 @@
     "express": "4.16.2",
     "socket.io": "2.0.4",
     "js-priority-queue": "0.1.5",
-    "fs": "0.0.1-security"
-  },
-  "devDependencies": {
+    "fs": "0.0.1-security",
+    "simplex-noise": "^2.3.0"
   }
 }
