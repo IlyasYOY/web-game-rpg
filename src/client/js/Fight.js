@@ -73,9 +73,10 @@ var doAttack = function (myEnemy) {
     } else if (skills[clickedSkills.skill] === skillNames[1] && myPerson.energy >= allSkills[skillNames[1]][1]){
         damage += allSkills[skillNames[1]][0] * myPerson.units['magician'];
         myPerson.energy -= allSkills[skillNames[1]][1];
-    } else if (myPerson.energy >= allSkills[skills[clickedSkills.skill]][0]){
+    } else if (myPerson.energy >= allSkills[skills[clickedSkills.skill]][1]){
         damage += allSkills[skills[clickedSkills.skill]][0];
         myPerson.energy -= allSkills[skills[clickedSkills.skill]][1];
+
     }
 
     players[myEnemy].units[clickedUnit.unit] -= damage / typesOfUnit[clickedUnit.unit].health;

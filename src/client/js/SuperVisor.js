@@ -5,7 +5,7 @@ var printBonusForSuperVisor = function (startX,startY,sizeOfCell,canvasContext) 
             } else if (mapBonus[i].numb === 4) {
                 canvasContext.fillStyle = '#ae0a00';
             } else if (mapBonus[i].numb === 5) {
-                canvasContext.fillStyle = '#fffd14';
+                canvasContext.fillStyle = '#ffff00';
             } else if (mapBonus[i].numb === 6) {
                 canvasContext.fillStyle = '#23d6ff';
             } else if (mapBonus[i].numb === 7) {
@@ -15,7 +15,7 @@ var printBonusForSuperVisor = function (startX,startY,sizeOfCell,canvasContext) 
             } else if (mapBonus[i].numb === 9) {
                 canvasContext.fillStyle = "#1d21ff";
             }
-        canvasContext.fillRect((mapBonus[i].x-startX)*(sizeOfCell),(mapBonus[i].y-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+            canvasContext.fillRect((mapBonus[i].x - startX) * (sizeOfCell), (mapBonus[i].y - startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
     }
 };
 
@@ -47,7 +47,6 @@ var printPlayersForSuperVisor = function (startX,startY,sizeOfCell,canvasContext
 
 
 var printMapForSuperVisor = function () {
-    console.log('lol3');
     for (let i = camera.startX;i<map.numberOfCell;++i){
         for (let j = camera.startY;j<map.numberOfCell;++j){
             printCellForSuperVisor(i,j,camera.startX,camera.startY,sizeOfCell,canvasContext);

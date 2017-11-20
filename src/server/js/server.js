@@ -28,6 +28,17 @@ module.exports = function startServer(dir) {
         }
     };
 
+    let mapBonus = [{numb:4,x:0,y:3},
+        {numb:9,x:1,y:2},
+        {numb:3,x:1,y:7},
+        {numb:3,x:1,y:12},
+        {numb:4,x:1,y:10},
+        {numb:5,x:8,y:0},
+        {numb:5,x:8,y:5},
+        {numb:6,x:0,y:5},
+        {numb:7,x:0,y:6},
+        {numb:8,x:0,y:7}];
+
     let mapHandler = {
         mapNames: [],
         currentMapNumber: 0,
@@ -158,6 +169,14 @@ module.exports = function startServer(dir) {
             }
         });
 
+        socket.on("emit_get_bonus",function () {
+            socket.emit("get_bonus", mapBonus);
+        });
+
+        socket.on("bonus_changed",function (bonus) {
+            mapBonus = bonus;
+        });
+
         socket.on("do_fight_step",function (myEnemyId,myEnemy,myEnergy) {
             io.sockets.connected[myEnemyId].player = myEnemy;
             socket.player.energy = myEnergy;
@@ -216,6 +235,11 @@ module.exports = function startServer(dir) {
                     break;
                 }
         });
+        socket.on("player_get_bonus", function (playerWithBonus) {
+           socket.player  = playerWithBonus;
+           console.log(socket.id);
+           console.log(socket.player);
+        });
 
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
@@ -223,6 +247,8 @@ module.exports = function startServer(dir) {
 
         socket.on("do_step", function (step,rangeOfStep) {
             if (socket.player.distance >= rangeOfStep) {
+                console.log(socket.player.distance);
+                console.log(rangeOfStep);
                 socket.player.distance -= rangeOfStep;
                 socket.player.x = step.x;
                 socket.player.y = step.y;

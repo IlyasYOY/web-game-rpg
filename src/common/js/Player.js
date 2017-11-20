@@ -27,7 +27,7 @@ class Player extends Entity{
     constructor(x = 0,y = 0,direction = 0, energy = 10,id){
         super(x,y,direction);
         this.rangeOfVisobility = 10;
-        this.inventory = ['fireball'];
+        this.inventory = [];
         this.keys = [id];
         this.units = {'warrior' : 5, 'magician' : 5};
         this.energy = energy/5;
