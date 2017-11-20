@@ -74,7 +74,7 @@ module.exports = function startServer(dir) {
         getCurrent() {
             return this.moveQueue[this.step];
         },
-        createNewPlayer() {
+        createNewPlayer(id) {
             let size = mapHandler.currentMap.numberOfCell;
             let x, y;
             let sockets = io.sockets.connected;
@@ -92,7 +92,7 @@ module.exports = function startServer(dir) {
                 }
                 search = false;
             }
-            return new Player(x, y, 0);
+            return new Player(x, y, 0,10,id);
         },
         nextMove() {
             this.step++;
@@ -115,7 +115,7 @@ module.exports = function startServer(dir) {
 
         if (moveHandler.moveQueue.length < utils.playersLimit) {
             console.log("This is new player.");
-            socket.player = moveHandler.createNewPlayer();
+            socket.player = moveHandler.createNewPlayer(socket.id);
             moveHandler.moveQueue.push(socket.id);
             socket.emit("game_stage", {
                 "stage": "Wait"
@@ -172,14 +172,17 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("end_of_fight",function (myEnemyId) {
+            for (let i in io.sockets.connected[myEnemyId].player.inventory){
+                if (socket.player.inventory.indexOf(io.sockets.connected[myEnemyId].player.inventory[i])== -1) {
+                    socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
+                }
+            }
 
-            // for (let i in io.sockets.connected[myEnemyId].player.inventory){
-            //     socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
-            // }
-            //
-            // for (let i of io.sockets.connected[myEnemyId].player.keys){
-            //     socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[i]);
-            // }
+            for (key in io.sockets.connected[myEnemyId].player.keys) {
+                socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[key]);
+            }
+
+            console.log(socket.player.keys);
 
             socket.player.energy = socket.player.maxEnergy;
 

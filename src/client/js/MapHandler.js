@@ -11,6 +11,29 @@ var printPath = function(array,startX,startY,sizeofCell,canvasContext){
     }
 };
 
+var printBonus = function (startX,startY,sizeOfCell,canvasContext) {
+    for (let i in mapBonus) {
+       if(fogOfWar(myPerson,mapBonus[i].x,mapBonus[i].y)) {
+           if (mapBonus[i].numb === 3) {
+               canvasContext.fillStyle = '#1b2a7e';
+           } else if (mapBonus[i].numb === 4) {
+               canvasContext.fillStyle = '#ae0a00';
+           } else if (mapBonus[i].numb === 5) {
+               canvasContext.fillStyle = '#ffff00';
+           } else if (mapBonus[i].numb === 6) {
+               canvasContext.fillStyle = '#23d6ff';
+           } else if (mapBonus[i].numb === 7) {
+               canvasContext.fillStyle = '#ffd3f5';
+           } else if (mapBonus[i].numb === 8) {
+               canvasContext.fillStyle = "#ff1a27";
+           } else if (mapBonus[i].numb === 9) {
+               canvasContext.fillStyle = "#1d21ff";
+           }
+           canvasContext.fillRect((mapBonus[i].x - startX) * (sizeOfCell), (mapBonus[i].y - startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
+       }
+    }
+};
+
 var cursorHandler = function (i,j) {
     if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)){
         if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j)){
@@ -72,20 +95,14 @@ var isInSquare = function(i,j,sizeOfCell,x,y){
 
 var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
     if (fogOfWar(myPerson,i,j)) {
-    if (map.ourMap[i][j] === 0) {
-        canvasContext.fillStyle = '#ffaa62';
-    } else if (map.ourMap[i][j] === -1) {
-        canvasContext.fillStyle = '#0069ff';
-    } else if (map.ourMap[i][j] === 2){
-        canvasContext.fillStyle = '#00ff15';
-    } else if (map.ourMap[i][j] === 3){
-        canvasContext.fillStyle = '#696d7e';
-    }else if (map.ourMap[i][j] === -2){
-        canvasContext.fillStyle = '#ae875e';
-    } else if (map.ourMap[i][j] === 4){
-        canvasContext.fillStyle = '#d4e8ff';
+    if (map.ourMap[i][j] === -1) {
+            canvasContext.fillStyle = '#0069ff';
+    } else if (map.ourMap[i][j] === 0){
+        canvasContext.fillStyle = '#ffb33f';
     } else if (map.ourMap[i][j] === 1){
-        canvasContext.fillStyle = '#fff581';
+        canvasContext.fillStyle = '#41b611';
+    } else if (map.ourMap[i][j] === 2){
+        canvasContext.fillStyle = '#f0f0e7';
     }} else {
         canvasContext.fillStyle = '#b9b9b9';
     }
@@ -122,6 +139,8 @@ var reloadMiniMap = function () {
             printPlayers(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
         }
     }
+
+    printBonus(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
 };
 
 
@@ -135,7 +154,7 @@ var reloadMainMap = function () {
         }
     }
     printPath(path,camera.startX,camera.startY,sizeOfCell,canvasContext);
-
+    printBonus(camera.startX,camera.startY,sizeOfCell,canvasContext);
 };
 
 var printMap = function () {
@@ -149,6 +168,7 @@ var printMap = function () {
             cursorHandler(i,j);
         }
     }
+    printBonus(0,0,miniMapHeight/map.numberOfCell,miniMapContext);
 };
 
 

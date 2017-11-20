@@ -2,7 +2,14 @@
 -1 - вода
 1 - дерево
 2 - камень
-5 - npc-охранник*/
+3 - зелье с (маной)energy(увеличивает максимальную энерджи)
+4 - зелье с выносливостью(distance)(полностью восстанавливает distance)
+5 - fireball
+6 - lightning
+7 - godpunch
+8 - войны(warrior) 5 - штук
+9 - маги(magician) 5 - штук
+10 - npc-охранник*/
 class Map{
     constructor(numberOfCell = 0){
         this.numberOfCell = numberOfCell;
@@ -34,7 +41,7 @@ class Map{
 }
 
 var isEnterable = function(map,i,j){
-    return map.ourMap[i][j] === 0 || map.ourMap[i][j] === 1;
+    return map.ourMap[i][j] === 0;
 };
 
 var fogOfWar = function(player,i,j){

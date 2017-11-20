@@ -1,10 +1,10 @@
-let skillNames = ['kick','mag_kick','fireball','heal' , 'armor'];
+let skillNames = ['kick','mag_kick','fireball','lightning' , 'godpunch'];
 
 let allSkills = {
-    'fireball' : [200, 4],
-    'heal' : [200, 3],
+    'fireball' : [200, 3],
+    'lightning' : [300, 4],
     'kick' : [20, 1],
-    'armor' : [200, 3],
+    'godpunch' : [1000, 15],
     'mag_kick' : [25, 2]};
 
 let whoMoves = 0;
@@ -249,12 +249,15 @@ var drawMySkills = function (myPerson) {
 
     for (let key in myPerson.inventory){
         if (i%5 === 0) ++k;
-        if (key === 'fireball'){
-            skills.push('fireball');
-            inventoryContext.fillStyle = "#fffb17";}
-        else if(key === 'heal'){
-            skills.push('heal');
-            inventoryContext.fillStyle = "#1eff1a";
+        if (myPerson.inventory[key] === skillNames[2]){
+            skills.push(skillNames[2]);
+            inventoryContext.fillStyle = "#ff9731";}
+        else if(myPerson.inventory[key] === skillNames[3]){
+            skills.push(skillNames[3]);
+            inventoryContext.fillStyle = "#23d6ff";
+        } else if(myPerson.inventory[key] === skillNames[4]){
+            skills.push(skillNames[3]);
+            inventoryContext.fillStyle = "#ffd3f5";
         }
         inventoryContext.fillRect(((i%5) * 40) % 200,k*40,40,40);
         ++i;
