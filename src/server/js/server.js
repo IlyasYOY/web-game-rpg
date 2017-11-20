@@ -113,6 +113,10 @@ module.exports = function startServer(dir) {
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
 
+        socket.on("message_sent", function(data) {
+            io.emit("message_sent", data);
+        });
+
         if (moveHandler.moveQueue.length < utils.playersLimit) {
             console.log("This is new player.");
             socket.player = moveHandler.createNewPlayer();
@@ -213,7 +217,6 @@ module.exports = function startServer(dir) {
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
         });
-
 
         socket.on("do_step", function (step,rangeOfStep) {
             if (socket.player.distance >= rangeOfStep) {
