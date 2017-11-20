@@ -11,11 +11,6 @@ let port = process.env.PORT || 8080;
 let ip = "127.0.0.1";
 
 module.exports = function startServer(dir) {
-    app.use(express.static(path.join(dir, "/src")));
-    app.get("/", function (req, res, next) {
-        res.sendFile(path.join(dir, "/src/client/html/index.html"));
-    });
-
     let utils = {
         playersLimit: 2,
         getRandomInt(min, max) {
@@ -109,6 +104,11 @@ module.exports = function startServer(dir) {
             this.step %= this.moveQueue.length;
         }
     };
+
+    app.use(express.static(path.join(dir, "/src")));
+    app.get("/", function (req, res, next) {
+        res.sendFile(path.join(dir, "/src/client/html/index.html"));
+    });
 
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
