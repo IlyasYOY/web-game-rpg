@@ -11,42 +11,64 @@ var printPath = function(array,startX,startY,sizeofCell,canvasContext){
     }
 };
 
+var checkPlayers = function (x,y,length) {
+    for (let i in players){
+        if (socket.id !== i && players[i].x === x && players[i].y === y){
+            socket.emit('do_step', {'x': x, 'y': y},path.length - length);
+            myPerson.x = x;
+            myPerson.y = y;
+            return false;
+        }
+    }
+    return true;
+};
+
 var checkTheWay = function (path,x,y) {
     let flag = false;
-    for (let i in mapBonus){
-        if (mapBonus[i].x === x && mapBonus[i].y == y){
-            if (mapBonus[i].numb === 3){
-                myPerson.maxEnergy += 1;
-                myPerson.energy = myPerson.maxEnergy;
-            } else  if(mapBonus[i].numb === 4){
-                myPerson.distance = myPerson.maxDistance + path.length;
-            } else  if(mapBonus[i].numb === 5){
-                if (myPerson.inventory.indexOf(skillNames[2])=== -1) {
-                    myPerson.inventory.push(skillNames[2]);
+    let length = 0;
+    for (let cell in path) {
+        flag = false;
+        if (!checkPlayers(path[cell][0],path[cell][1],length)){
+            return false;
+        }
+        for (let i in mapBonus) {
+            if (mapBonus[i].x === path[cell][0] && mapBonus[i].y === path[cell][1]) {
+                if (mapBonus[i].numb === 3) {
+                    myPerson.maxEnergy += 1;
+                    myPerson.energy = myPerson.maxEnergy;
+                } else if (mapBonus[i].numb === 4) {
+                    myPerson.distance = myPerson.maxDistance + (path.length-length);
+                } else if (mapBonus[i].numb === 5) {
+                    if (myPerson.inventory.indexOf(skillNames[2]) === -1) {
+                        myPerson.inventory.push(skillNames[2]);
+                    }
+                } else if (mapBonus[i].numb === 6) {
+                    if (myPerson.inventory.indexOf(skillNames[3]) === -1) {
+                        myPerson.inventory.push(skillNames[3]);
+                    }
+                } else if (mapBonus[i].numb === 7) {
+                    if (myPerson.inventory.indexOf(skillNames[4]) === -1) {
+                        myPerson.inventory.push(skillNames[4]);
+                    }
+                } else if (mapBonus[i].numb === 8) {
+                    myPerson.units.warrior += 5;
+                } else if (mapBonus[i].numb === 9) {
+                    myPerson.units.magician += 5;
                 }
-            } else  if(mapBonus[i].numb === 6){
-                if (myPerson.inventory.indexOf(skillNames[3])=== -1) {
-                    myPerson.inventory.push(skillNames[3]);
-                }
-            }else  if(mapBonus[i].numb === 7){
-                if (myPerson.inventory.indexOf(skillNames[4])=== -1) {
-                    myPerson.inventory.push(skillNames[4]);
-                }
-            }else  if(mapBonus[i].numb === 8){
-                myPerson.units.warrior += 5;
-            } else  if(mapBonus[i].numb === 9){
-                myPerson.units.magician += 5;
-            }
-            mapBonus.splice(i,1);
-            flag = true;
-            break;
+                mapBonus.splice(i, 1);
+                flag = true;
+                break;
             }
         }
 
-    if (flag) {
-        socket.emit("bonus_changed",mapBonus);
-        socket.emit("player_get_bonus", myPerson);
+        if (flag) {
+            socket.emit("bonus_changed", mapBonus);
+            socket.emit("player_get_bonus", myPerson);
+        }
+        ++length;
     }
+
+    return true;
 };
 
 var printBonus = function (startX,startY,sizeOfCell,canvasContext) {
@@ -92,7 +114,6 @@ var cursorHandler = function (i,j) {
 
         canvasContext.fillStyle = '#000000';
         if (mauseCoord.isDown === true){
-            console.log(clickedSells);
             if (clickedSells.x === i && clickedSells.y === j){
                 clickedSells.isDoubleClick = true;
             } else {
@@ -110,9 +131,9 @@ var cursorHandler = function (i,j) {
             if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight) {
                 if (clickedSells.isDoubleClick && myPerson.distance >= path.length) {
                     reloadMiniMap();
-                    checkTheWay(path,i,j);
+                    if (checkTheWay(path,i,j)){
                     socket.emit('do_step', {'x': i, 'y': j},path.length);
-                    socket.emit("emit_get_player");
+                    socket.emit("emit_get_player");}
                     path = [];
                 }
             }

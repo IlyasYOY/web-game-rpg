@@ -205,8 +205,6 @@ module.exports = function startServer(dir) {
                 socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[key]);
             }
 
-            console.log(socket.player.keys);
-
             socket.player.energy = socket.player.maxEnergy;
 
             moveHandler.deletePlayer(myEnemyId);
@@ -237,8 +235,6 @@ module.exports = function startServer(dir) {
         });
         socket.on("player_get_bonus", function (playerWithBonus) {
            socket.player  = playerWithBonus;
-           console.log(socket.id);
-           console.log(socket.player);
         });
 
         socket.on("emit_get_player", function () {
@@ -247,8 +243,6 @@ module.exports = function startServer(dir) {
 
         socket.on("do_step", function (step,rangeOfStep) {
             if (socket.player.distance >= rangeOfStep) {
-                console.log(socket.player.distance);
-                console.log(rangeOfStep);
                 socket.player.distance -= rangeOfStep;
                 socket.player.x = step.x;
                 socket.player.y = step.y;
