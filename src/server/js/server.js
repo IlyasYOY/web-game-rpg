@@ -11,11 +11,6 @@ let port = process.env.PORT || 8080;
 let ip = "127.0.0.1";
 
 module.exports = function startServer(dir) {
-    app.use(express.static(path.join(dir, "/src")));
-    app.get("/", function (req, res, next) {
-        res.sendFile(path.join(dir, "/src/client/html/index.html"));
-    });
-
     let utils = {
         playersLimit: 2,
         getRandomInt(min, max) {
@@ -110,8 +105,17 @@ module.exports = function startServer(dir) {
         }
     };
 
+    app.use(express.static(path.join(dir, "/src")));
+    app.get("/", function (req, res, next) {
+        res.sendFile(path.join(dir, "/src/client/html/index.html"));
+    });
+
     io.on("connect", function (socket) {
         console.log(`Socket connected: ${socket.id}`);
+
+        socket.on("message_sent", function(data) {
+            io.emit("message_sent", data);
+        });
 
         if (moveHandler.moveQueue.length < utils.playersLimit) {
             console.log("This is new player.");
@@ -216,7 +220,6 @@ module.exports = function startServer(dir) {
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
         });
-
 
         socket.on("do_step", function (step,rangeOfStep) {
             if (socket.player.distance >= rangeOfStep) {
