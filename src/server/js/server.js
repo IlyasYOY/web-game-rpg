@@ -210,7 +210,7 @@ module.exports = function startServer(dir) {
 
             socket.player.energy = socket.player.maxEnergy;
             socket.emit("get_player", socket.player);
-            
+
             moveHandler.deletePlayer(myEnemyId);
 
             socket.emit("game_stage", {
@@ -219,6 +219,39 @@ module.exports = function startServer(dir) {
             io.sockets.connected[myEnemyId].emit("game_stage", {
                 "stage": "Supervisor"
             });
+        });
+
+        socket.on("run", function (myEnemy) {
+            io.sockets.connected[myEnemy].player.units['warrior'] += parseInt(socket.player.units['warrior'] / 2);
+            io.sockets.connected[myEnemy].player.units['magician'] += parseInt(socket.player.units['magician'] / 2);
+            socket.player.units['warrior']  = parseInt(socket.player.units['warrior'] / 2);
+            socket.player.units['magician'] = parseInt(socket.player.units['magician'] / 2);
+
+
+            if (isEnterable(mapHandler.currentMap, socket.player.x+1,socket.player.y)) {
+                socket.player.x += 1
+            } else if (isEnterable(mapHandler.currentMap, socket.player.x-1,socket.player.y)) {
+                socket.player.x -= 1
+            } else if (isEnterable(mapHandler.currentMap, socket.player.x,socket.player.y + 1)) {
+                socket.player.y += 1
+            } else if (isEnterable(mapHandler.currentMap, socket.player.x,socket.player.y - 1)) {
+                socket.player.y -= 1
+            }
+
+            socket.emit("game_stage", {
+                "stage": "Wait"
+            });
+
+            io.sockets.connected[myEnemy].emit("game_stage", {
+                "stage": "Wait"
+            });
+
+            socket.emit("get_player",socket.player);
+            socket.emit("get_players",utils.getPlayers());
+            io.sockets.connected[myEnemy].emit("get_player",io.sockets.connected[myEnemy].player);
+            io.sockets.connected[myEnemy].emit("get_players",utils.getPlayers());
+            moveHandler.nextMove();
+            io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
         });
 
         socket.on("fight", function (myEnemy) {

@@ -17,7 +17,7 @@ var printFightMenu = function(chainedPoint){
 
 };
 
-var fightMenuHandler = function () {
+var fightMenuHandler = function (myEnemy) {
     if (keysPushed[ButtonsKeys['up']] === true){
         if (FightMenu.numberOfPoint>0) --FightMenu.numberOfPoint;
     }
@@ -30,7 +30,7 @@ var fightMenuHandler = function () {
         if (FightMenu.menuPoints[FightMenu.numberOfPoint] === 'Fight'){
             socket.emit('fight',myEnemy);
         } else if (FightMenu.menuPoints[FightMenu.numberOfPoint] === 'Run'){
-            socket.emit('run');
+            socket.emit('run',myEnemy);
         } else if (FightMenu.menuPoints[FightMenu.numberOfPoint] === 'Unite'){
             socket.emit('unite');
         }
