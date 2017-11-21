@@ -207,11 +207,12 @@ module.exports = function startServer(dir) {
             for (key in io.sockets.connected[myEnemyId].player.keys) {
                 socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[key]);
             }
-            console.log(socket.player);
 
             socket.player.energy = socket.player.maxEnergy;
-
+            socket.emit("get_player", socket.player);
+            
             moveHandler.deletePlayer(myEnemyId);
+
             socket.emit("game_stage", {
                 "stage": "Map"
             });
