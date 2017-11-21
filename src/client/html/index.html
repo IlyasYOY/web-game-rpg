@@ -243,7 +243,8 @@
             if (whereAmI === 'Menu') {
                 menuHandler();
             } else if (whereAmI === 'FightMenu') {
-                fightMenuHandler();
+                reloadMiniMap();
+                fightMenuHandler(myEnemy);
             } else if (whereAmI === 'Map') {
                 toMap();
             } else if (whereAmI === 'Fight') {
