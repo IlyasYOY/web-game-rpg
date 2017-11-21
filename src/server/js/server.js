@@ -197,8 +197,9 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("end_of_fight",function (myEnemyId) {
+
             for (let i in io.sockets.connected[myEnemyId].player.inventory){
-                if (socket.player.inventory.indexOf(io.sockets.connected[myEnemyId].player.inventory[i])== -1) {
+                if (socket.player.inventory.indexOf(io.sockets.connected[myEnemyId].player.inventory[i])=== -1) {
                     socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
                 }
             }
@@ -206,6 +207,7 @@ module.exports = function startServer(dir) {
             for (key in io.sockets.connected[myEnemyId].player.keys) {
                 socket.player.keys.push(io.sockets.connected[myEnemyId].player.keys[key]);
             }
+            console.log(socket.player);
 
             socket.player.energy = socket.player.maxEnergy;
 

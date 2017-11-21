@@ -11,6 +11,7 @@
     <script src="/client/js/MapHandler.js"></script>
     <script src="/client/js/Fight.js"></script>
     <script src="/client/js/FightMenu.js"></script>
+    <script src="/client/js/MapsMenu.js"></script>
     <script src="/common/js/Map.js"></script>
     <script src="/common/js/Player.js"></script>
     <script src="/client/js/FindPath.js"></script>
@@ -255,6 +256,11 @@
                 canvasContext.font = "20px Georgia";
                 canvasContext.fillStyle = "#000000";
                 canvasContext.fillText('YOU WIN', 250, 300);
+                if (keysPushed[ButtonsKeys['enter']] === true){
+                    whereAmI = 'MapMenu';
+                }
+            } else if(whereAmI === 'MapMenu'){
+                mapMenuHandler();
             }
         }
     }, 1000 / 60);

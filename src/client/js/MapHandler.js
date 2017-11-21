@@ -14,7 +14,7 @@ var printPath = function(array,startX,startY,sizeofCell,canvasContext){
 var checkPlayers = function (x,y,length) {
     for (let i in players){
         if (socket.id !== i && players[i].x === x && players[i].y === y){
-            socket.emit('do_step', {'x': x, 'y': y},path.length - length);
+            socket.emit('do_step', {'x': x, 'y': y},length);
             myPerson.x = x;
             myPerson.y = y;
             return false;
@@ -25,7 +25,7 @@ var checkPlayers = function (x,y,length) {
 
 var checkTheWay = function (path,x,y) {
     let flag = false;
-    let length = 0;
+    let length = 1;
     for (let cell in path) {
         flag = false;
         if (!checkPlayers(path[cell][0],path[cell][1],length)){
@@ -37,7 +37,7 @@ var checkTheWay = function (path,x,y) {
                     myPerson.maxEnergy += 1;
                     myPerson.energy = myPerson.maxEnergy;
                 } else if (mapBonus[i].numb === 4) {
-                    myPerson.distance = myPerson.maxDistance + (path.length-length);
+                    myPerson.distance = myPerson.maxDistance + length;
                 } else if (mapBonus[i].numb === 5) {
                     if (myPerson.inventory.indexOf(skillNames[2]) === -1) {
                         myPerson.inventory.push(skillNames[2]);
@@ -52,8 +52,11 @@ var checkTheWay = function (path,x,y) {
                     }
                 } else if (mapBonus[i].numb === 8) {
                     myPerson.units.warrior += 5;
+
+                    myPerson.maxDistance = newMaxDistance(myPerson);
                 } else if (mapBonus[i].numb === 9) {
                     myPerson.units.magician += 5;
+                    myPerson.maxDistance = newMaxDistance(myPerson);
                 }
                 mapBonus.splice(i, 1);
                 flag = true;
