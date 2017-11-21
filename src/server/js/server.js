@@ -116,19 +116,38 @@ module.exports = function startServer(dir) {
             for (let i = 0; i < n; i++) {
                 let x;
                 let y;
-                let number = Math.floor(Math.random() * 7) + 3;
+                let number = utils.getRandomInt(3, 7);
                 let isOver = false;                
 
                 do {
-                    y = Math.floor(Math.random() * mapHandler.currentMap.numberOfCell);
-                    x = Math.floor(Math.random() * mapHandler.currentMap.numberOfCell);
+                    y = utils.getRandomInt(0, mapHandler.currentMap.numberOfCell);
+                    x = utils.getRandomInt(0, mapHandler.currentMap.numberOfCell);
                     isOver = false;
 
                     for (let id of ids) {
-                        if (io.sockets.connected[id].player.x == x && io.sockets.connected[id].player.y == y) {
-                            isOver = true;
+                        if (id.indexOf('bot') == 0) {
                             continue;
                         }
+                        if (io.sockets.connected[id].player.x == x && io.sockets.connected[id].player.y == y) {
+                            isOver = true;
+                            break;
+                        }
+                    }
+
+                    if (isOver) {
+                        continue;
+                    }
+
+                    if (io.bots) {
+                        for (let id of ids) {
+                            if (id.indexOf('bot') != 0) {
+                                continue;
+                            }
+                            if (io.bots[id].player.x == x && io.bots[id].player.y == y) {
+                                isOver = true;
+                                break;
+                            }
+                        } 
                     }
 
                     if (isOver) {
@@ -142,7 +161,7 @@ module.exports = function startServer(dir) {
                         }
                     }
 
-                } while (isOver && !isEnterable(x) && !isEnterable(y));
+                } while (isOver && !isEnterable(mapHandler.currentMap, x, y));
                 
                 bonuses.push({
                     "numb": number,
@@ -170,7 +189,7 @@ module.exports = function startServer(dir) {
         }
     };
 
-    let mapBonus = moveHandler.getBonuses(5);
+    let mapBonus;
 
     app.use(express.static(path.join(dir, "/src")));
     app.get("/", function (req, res, next) {
@@ -178,6 +197,8 @@ module.exports = function startServer(dir) {
     });
 
     io.on("connect", function (socket) {
+        let numberOfBots = 3;
+        let numberOfBonuses = 5;
         console.log(`Socket connected: ${socket.id}`);
 
         socket.on("message_sent", function(data) {
@@ -192,7 +213,8 @@ module.exports = function startServer(dir) {
                 "stage": "Wait"
             });
             if (moveHandler.moveQueue.length === utils.playersLimit) {
-                io.bots = moveHandler.getNPCs(3);
+                io.bots = moveHandler.getNPCs(numberOfBots);
+                mapBonus = moveHandler.getBonuses(numberOfBonuses);                
                 io.emit("who_moves", moveHandler.getCurrent());
             }
         } else {
