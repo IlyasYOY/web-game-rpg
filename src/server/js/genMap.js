@@ -1,10 +1,7 @@
 let SimplexNoise = require('simplex-noise');
+let fs = require('fs');
 
-function getMap(size, waterC = 1/4, rockC = 1/10, treeC = 1/10) {
-    if (!size) {
-        size = 100;
-    }
-
+function getMap(size = 100, waterC = 1/4, rockC = 1/10, treeC = 1/10) {
     let map = {
         numberOfCell: size,
         ourMap: []
@@ -45,6 +42,6 @@ function getMap(size, waterC = 1/4, rockC = 1/10, treeC = 1/10) {
     }
 }
 
-console.log(getMap(30));
+fs.writeFileSync('./src/server/js/json/map3.json', JSON.stringify(getMap(70)));
 
 module.exports = getMap;
