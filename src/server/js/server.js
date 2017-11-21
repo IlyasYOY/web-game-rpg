@@ -121,7 +121,7 @@ module.exports = function startServer(dir) {
                     for (let id of ids) {
                         if (io.sockets.connected[id].player.x == x && io.sockets.connected[id].player.y == y) {
                             isOver = true;
-                            break;
+                            continue;
                         }
                     }
 
@@ -132,7 +132,7 @@ module.exports = function startServer(dir) {
                     for (let bonus of bonuses) {
                         if (bonus.x == x && bonus.y == y) {
                             isOver = true;
-                            break;
+                            continue;
                         }
                     }
 
