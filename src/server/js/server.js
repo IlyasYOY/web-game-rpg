@@ -72,6 +72,25 @@ module.exports = function startServer(dir) {
         getCurrent() {
             return this.moveQueue[this.step];
         },
+        botTurn(id){
+            let getObjects = function(){
+                let objects = [];
+                for(let i in mapBonus){
+                    objects.push( [mapBonus[i].x,mapBonus[i].y,"bonus"]);
+                }
+                for(let i in io.bots){
+                    objects.push( [io.bots[i].player.x,io.bots[i].player.y,"bot"]);
+                }
+                for(let i in io.sockets.connected){
+                    objects.push( [io.sockets.connected[i].player.x,io.sockets.connected[i].player.y,"player"]);
+                }
+                return objects;
+            };
+            let nearObject = function (arr) {
+
+            }
+            console.log(nearObject());
+        },
         createNewPlayer(id) {
             let size = mapHandler.currentMap.numberOfCell;
             let x, y;
@@ -95,9 +114,16 @@ module.exports = function startServer(dir) {
             }
             return new Player(x, y, 0,10,id);
         },
+
         nextMove() {
             this.step++;
             this.step %= this.moveQueue.length;
+            if(this.moveQueue[this.step].indexOf("bot")==0){
+                //DO SOMETHING
+                //console.log(io.bots[this.moveQueue[this.step]].player);
+                this.botTurn(this.moveQueue[this.step]);
+                this.nextMove();
+            }
         },
         deletePlayer(id){
             for (let i in this.moveQueue){
