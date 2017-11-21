@@ -28,8 +28,9 @@ var printCellForSuperVisor = function (i,j,startX,startY,sizeOfCell,canvasContex
         canvasContext.fillStyle = '#41b611';
     } else if (map.ourMap[i][j] === 2){
         canvasContext.fillStyle = '#f0f0e7';
+    }else if (map.ourMap[i][j] === 11){
+        canvasContext.fillStyle = '#000000';
     }
-    console.log('lol5');
     canvasContext.strokeStyle = '#000000';
     //canvasContext.strokeRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell); }
     canvasContext.strokeRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);

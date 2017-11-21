@@ -95,46 +95,51 @@ var printBonus = function (startX,startY,sizeOfCell,canvasContext) {
 };
 
 var cursorHandler = function (i,j) {
-    if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)){
-        if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j)){
+    if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)) {
+        if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j)) {
             canvasContext.fillStyle = '#ffffff';
             miniMapContext.fillStyle = '#ffffff';
         } else {
             canvasContext.fillStyle = '#d7001d';
             miniMapContext.fillStyle = '#d7001d';
         }
-        canvasContext.fillRect((i-camera.startX)*(sizeOfCell),(j-camera.startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+        canvasContext.fillRect((i - camera.startX) * (sizeOfCell), (j - camera.startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
 
 
         if (mauseCoord.x <= canvasHeight)
-            miniMapContext.fillRect(i * miniMapHeight/map.numberOfCell,
+            miniMapContext.fillRect(i * miniMapHeight / map.numberOfCell,
                 j * miniMapHeight / map.numberOfCell,
                 miniMapHeight / map.numberOfCell,
                 miniMapHeight / map.numberOfCell);
 
         canvasContext.fillStyle = '#000000';
-        if (mauseCoord.isDown === true){
-            if (clickedSells.x === i && clickedSells.y === j){
+        if (mauseCoord.isDown === true) {
+            if (clickedSells.x === i && clickedSells.y === j) {
                 clickedSells.isDoubleClick = true;
             } else {
-            clickedSells.x = i;
-            clickedSells.y = j;
-            if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j)) {
-                path = findPath(map, [myPerson.x, myPerson.y], [i, j]);
-                path.splice(0,1);
-            } else {
-                path = [];
-            }
-            clickedSells.isDoubleClick = false;
+                clickedSells.x = i;
+                clickedSells.y = j;
+                if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j)) {
+                    path = findPath(map, [myPerson.x, myPerson.y], [i, j]);
+                    path.splice(0, 1);
+                } else {
+                    path = [];
+                }
+                clickedSells.isDoubleClick = false;
             }
             mauseCoord.isDown = false;
-            if (fogOfWar(myPerson,i,j) && isEnterable(map,i,j) === true && mauseCoord.x<=canvasHeight) {
+            if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j) === true && mauseCoord.x <= canvasHeight) {
                 if (clickedSells.isDoubleClick && myPerson.distance >= path.length) {
-                    reloadMiniMap();
-                    if (checkTheWay(path,i,j)){
-                    socket.emit('do_step', {'x': i, 'y': j},path.length);
-                    socket.emit("emit_get_player");}
-                    path = [];
+                    if (map.ourMap[i][j] === 11) {
+                        socket.emit("game_end");
+                    } else {
+                        reloadMiniMap();
+                        if (checkTheWay(path, i, j)) {
+                            socket.emit('do_step', {'x': i, 'y': j}, path.length);
+                            socket.emit("emit_get_player");
+                        }
+                        path = [];
+                    }
                 }
             }
         }
@@ -161,6 +166,8 @@ var printCell = function (i,j,startX,startY,sizeOfCell,canvasContext) {
         canvasContext.fillStyle = '#41b611';
     } else if (map.ourMap[i][j] === 2){
         canvasContext.fillStyle = '#f0f0e7';
+    }else if (map.ourMap[i][j] === 11){
+        canvasContext.fillStyle = '#000000';
     }} else {
         canvasContext.fillStyle = '#b9b9b9';
     }
@@ -268,6 +275,7 @@ var toMap = function () {
 
     canvasContext.clearRect(0,0,canvasWidth,canvasHeight);
     if (whereAmI === "Map") {
+        drawMySkills(myPerson);
         printMap();
     }
     else {

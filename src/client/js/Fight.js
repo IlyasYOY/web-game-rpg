@@ -252,7 +252,7 @@ var drawMySkills = function (myPerson) {
         if (i%5 === 0) ++k;
         if (myPerson.inventory[key] === skillNames[2]){
             skills.push(skillNames[2]);
-            inventoryContext.fillStyle = "#ff9731";}
+            inventoryContext.fillStyle = "#fffd14";}
         else if(myPerson.inventory[key] === skillNames[3]){
             skills.push(skillNames[3]);
             inventoryContext.fillStyle = "#23d6ff";

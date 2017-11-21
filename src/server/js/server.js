@@ -149,6 +149,8 @@ module.exports = function startServer(dir) {
             mapHandler.loadCurrentMap(socket);
         });
 
+        socket.emit("get_players_limit",utils.playersLimit);
+
         socket.on("emit_get_players", function () {
             socket.emit("get_players", utils.getPlayers());
         });
@@ -273,6 +275,16 @@ module.exports = function startServer(dir) {
                 }
             }
        });
+
+        socket.on("game_end",function () {
+            for (let id in io.sockets.connected)
+                    io.sockets.connected[id].emit("game_stage", {
+                        "stage": "Supervisor"
+                    });
+            socket.emit("game_stage", {
+                "stage": "Win"
+            });
+        });
 
         socket.on("disconnect", function () {
             //...

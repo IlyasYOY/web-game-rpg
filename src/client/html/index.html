@@ -161,6 +161,7 @@
     //    var playerTwo = new Player(3, 0, 0, 10);
     //    var playerThree = new Player(0, 3, 0, 15);
     var map;
+    var playersLimit;
     var players;
     //    = [playerOne, playerTwo, playerThree];
     var myPerson;
@@ -185,6 +186,9 @@
     socket.emit("emit_get_map");
     socket.on("get_map", function (mMap) {
         map = JSON.parse(mMap);
+    });
+    socket.on("get_players_limit", function (limit) {
+        playersLimit = limit;
     });
     socket.on("game_stage", function (wh) {
         whereAmI = wh.stage;
@@ -227,6 +231,7 @@
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
         if (whereAmI === 'Wait') {
             canvas.style.opacity = "0.5";
+            drawMySkills(myPerson);
             reloadMainMap();
             canvasContext.font = "20px Georgia";
             canvasContext.fillStyle = "#000000";
@@ -246,6 +251,10 @@
             } else if (whereAmI === 'Supervisor') {
                 reloadMiniMapForSuperVisor();
                 toMap();
+            }else if (whereAmI === 'Win') {
+                canvasContext.font = "20px Georgia";
+                canvasContext.fillStyle = "#000000";
+                canvasContext.fillText('YOU WIN', 250, 300);
             }
         }
     }, 1000 / 60);

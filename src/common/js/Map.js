@@ -9,7 +9,8 @@
 7 - godpunch
 8 - войны(warrior) 5 - штук
 9 - маги(magician) 5 - штук
-10 - npc-охранник*/
+10 - npc-охранник
+11 - выход*/
 class Map{
     constructor(numberOfCell = 0){
         this.numberOfCell = numberOfCell;
@@ -41,7 +42,7 @@ class Map{
 }
 
 var isEnterable = function(map,i,j){
-    return map.ourMap[i][j] === 0;
+    return (map.ourMap[i][j] === 11 && myPerson.keys.length >= (parseInt(playersLimit / 2) + 1)) || map.ourMap[i][j] === 0;
 };
 
 var fogOfWar = function(player,i,j){
