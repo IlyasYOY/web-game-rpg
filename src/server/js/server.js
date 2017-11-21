@@ -23,6 +23,9 @@ module.exports = function startServer(dir) {
             for (let id in sockets) {
                 players[sockets[id].id] = sockets[id].player;
             }
+            for (let id in io.bots) {
+                players[id] = io.bots[id].player;
+            }
 
             return players;
         }
@@ -81,6 +84,9 @@ module.exports = function startServer(dir) {
                     continue;
                 }
                 for (let id of this.moveQueue) {
+                    if (!sockets[id]) {
+                        continue;
+                    }
                     if (sockets[id].player.x == x && sockets[id].player.y == y) {
                         continue;
                     }
@@ -138,18 +144,33 @@ module.exports = function startServer(dir) {
 
                 } while (isOver && !isEnterable(x) && !isEnterable(y));
                 
-                bonuses.push({"numb": number,
+                bonuses.push({
+                    "numb": number,
                     "x": x,
                     "y": y
                 });
             }
 
             return bonuses;
+        },
+        getNPCs(n) {
+            let bots = {};
+
+            for (let i = 0; i < n; i++) {
+                let id = "bot" + i;
+                let bot = {
+                    "id": id,
+                    "player": moveHandler.createNewPlayer(id)
+                }
+                bots[id] = bot;
+                moveHandler.moveQueue.push(id)
+            }
+
+            return bots;
         }
     };
 
     let mapBonus = moveHandler.getBonuses(5);
-    console.log(mapBonus);
 
     app.use(express.static(path.join(dir, "/src")));
     app.get("/", function (req, res, next) {
@@ -171,6 +192,7 @@ module.exports = function startServer(dir) {
                 "stage": "Wait"
             });
             if (moveHandler.moveQueue.length === utils.playersLimit) {
+                io.bots = moveHandler.getNPCs(3);
                 io.emit("who_moves", moveHandler.getCurrent());
             }
         } else {
