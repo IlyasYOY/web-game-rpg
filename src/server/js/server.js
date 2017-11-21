@@ -28,17 +28,6 @@ module.exports = function startServer(dir) {
         }
     };
 
-    let mapBonus = [{numb:4,x:0,y:3},
-        {numb:9,x:1,y:2},
-        {numb:3,x:1,y:7},
-        {numb:3,x:1,y:12},
-        {numb:4,x:1,y:10},
-        {numb:5,x:8,y:0},
-        {numb:5,x:8,y:5},
-        {numb:6,x:0,y:5},
-        {numb:7,x:0,y:6},
-        {numb:8,x:0,y:7}];
-
     let mapHandler = {
         mapNames: [],
         currentMapNumber: 0,
@@ -113,8 +102,54 @@ module.exports = function startServer(dir) {
             }
             this.step++;
             this.step %= this.moveQueue.length;
+        },
+        getBonuses(n) {
+            let ids = moveHandler.moveQueue;
+            let bonuses = [];
+
+            for (let i = 0; i < n; i++) {
+                let x;
+                let y;
+                let number = Math.floor(Math.random() * 7) + 3;
+                let isOver = false;                
+
+                do {
+                    y = Math.floor(Math.random() * mapHandler.currentMap.numberOfCell);
+                    x = Math.floor(Math.random() * mapHandler.currentMap.numberOfCell);
+                    isOver = false;
+
+                    for (let id of ids) {
+                        if (io.sockets.connected[id].player.x == x && io.sockets.connected[id].player.y == y) {
+                            isOver = true;
+                            break;
+                        }
+                    }
+
+                    if (isOver) {
+                        continue;
+                    }
+
+                    for (let bonus of bonuses) {
+                        if (bonus.x == x && bonus.y == y) {
+                            isOver = true;
+                            break;
+                        }
+                    }
+
+                } while (isOver && !isEnterable(x) && !isEnterable(y));
+                
+                bonuses.push({"numb": number,
+                    "x": x,
+                    "y": y
+                });
+            }
+
+            return bonuses;
         }
     };
+
+    let mapBonus = moveHandler.getBonuses(5);
+    console.log(mapBonus);
 
     app.use(express.static(path.join(dir, "/src")));
     app.get("/", function (req, res, next) {
