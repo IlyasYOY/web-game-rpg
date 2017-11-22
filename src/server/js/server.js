@@ -96,7 +96,19 @@ module.exports = function startServer(dir) {
             return new Player(x, y, 0,10,id);
         },
         botStep(id){
-
+            let getObjects = function () {
+                let objects = [];
+                for (let i in mapBonus) {
+                    objects.push([mapBonus[i].x, mapBonus[i].y, "bonus"]);
+                }
+                for (let i in io.bots) {
+                    objects.push([io.bots[i].player.x, io.bots[i].player.y, "bot"]);
+                }
+                for (let i in io.sockets.connected) {
+                    objects.push([io.sockets.connected[i].player.x, io.sockets.connected[i].player.y, "player"]);
+                }
+                return objects;
+            };
         },
         nextMove() {
                 this.step++;
