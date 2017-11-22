@@ -95,9 +95,15 @@ module.exports = function startServer(dir) {
             }
             return new Player(x, y, 0,10,id);
         },
+        botStep(id){
+
+        },
         nextMove() {
-            this.step++;
-            this.step %= this.moveQueue.length;
+                this.step++;
+                this.step %= this.moveQueue.length;
+                if (this.moveQueue[this.step].indexOf('bot') !== 0){
+                    botStep(this.moveQueue[this.step]);
+                }
         },
         deletePlayer(id){
             for (let i in this.moveQueue){
