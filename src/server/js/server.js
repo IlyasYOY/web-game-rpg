@@ -6,6 +6,8 @@ let app = express();
 let http = require('http').Server(app);
 let io = require('socket.io')(http);
 let isEnterable = require('../../common/js/Map').isEnterable;
+let findPath = require('./FindPath').findPath;
+
 
 let port = process.env.PORT || 8080;
 let ip = "127.0.0.1";
@@ -96,25 +98,125 @@ module.exports = function startServer(dir) {
             return new Player(x, y, 0,10,id);
         },
         botStep(id){
-            let getObjects = function () {
+            let skillNames = ['kick','mag_kick','fireball','lightning' , 'godpunch'];
+            let newMaxDistance = function (player) {
+                return parseInt((player.units.warrior*(200/typesOfUnit['warrior'].speed) + player.units.magician*(200/typesOfUnit['magician'].speed))/50);
+            };
+            let checkTheBotWay = function (path,id,x,y) {
+                let flag = false;
+                let length = 1;
+                for (let cell in path) {
+                    for (let i in mapBonus) {
+                        if (mapBonus[i].x === path[cell][0] && mapBonus[i].y === path[cell][1]) {
+                            if (mapBonus[i].numb === 3) {
+                                io.bots[id].player.maxEnergy += 1;
+                                io.bots[id].player.energy = io.bots[id].player.maxEnergy;
+                            } else if (mapBonus[i].numb === 4) {
+                                io.bots[id].player.distance = io.bots[id].player.maxDistance;
+                            } else if (mapBonus[i].numb === 5) {
+                                if (io.bots[id].player.inventory.indexOf(skillNames[2]) === -1) {
+                                    io.bots[id].player.inventory.push(skillNames[2]);
+                                }
+                            } else if (mapBonus[i].numb === 6) {
+                                if (io.bots[id].player.inventory.indexOf(skillNames[3]) === -1) {
+                                    io.bots[id].player.inventory.push(skillNames[3]);
+                                }
+                            } else if (mapBonus[i].numb === 7) {
+                                if (io.bots[id].player.inventory.indexOf(skillNames[4]) === -1) {
+                                    io.bots[id].player.inventory.push(skillNames[4]);
+                                }
+                            } else if (mapBonus[i].numb === 8) {
+                                io.bots[id].player.units.warrior += 5;
+                                io.bots[id].player.maxDistance = newMaxDistance(io.bots[id].player);
+                            } else if (mapBonus[i].numb === 9) {
+                                io.bots[id].player.units.magician += 5;
+                                io.bots[id].player.maxDistance = newMaxDistance(io.bots[id].player);
+                            }
+                            mapBonus.splice(i, 1);
+                            flag = true;
+                            break;
+                        }
+                    }
+                    ++length;
+                }
+
+            };
+            let getObjects = function (id) {
+                let compareStrength = function (me,enemy){
+                    let sumMe = me.player.units.warrior + me.player.units.magician;
+                    let sumEnemy = enemy.player.units.warrior + enemy.player.units.magician;
+                    return sumMe > sumEnemy;
+                };
+
                 let objects = [];
                 for (let i in mapBonus) {
-                    objects.push([mapBonus[i].x, mapBonus[i].y, "bonus"]);
+                    objects.push(mapBonus[i]);
                 }
                 for (let i in io.bots) {
-                    objects.push([io.bots[i].player.x, io.bots[i].player.y, "bot"]);
+                    if (i!==id && compareStrength(io.bots[id],io.bots[i])) {
+                        console.log(io.bots[i]);
+                        objects.push(io.bots[i].player);
+                    }
                 }
                 for (let i in io.sockets.connected) {
-                    objects.push([io.sockets.connected[i].player.x, io.sockets.connected[i].player.y, "player"]);
+                    if (io.sockets.connected[i].player && compareStrength(io.bots[id],io.sockets.connected[i])) {
+                        objects.push(io.sockets.connected[i].player);
+                        console.log(io.sockets.connected[i]);
+                    }
                 }
                 return objects;
             };
+
+            let searchNear = function (objects,botX,botY) {
+                let length;
+                let minLength = findPath(mapHandler.currentMap, [botX,botY] ,[objects[0].x,objects[0].y]);
+                for (let i in objects){
+                    length = findPath(mapHandler.currentMap, [botX,botY] ,[objects[i].x,objects[i].y]);
+                    if(minLength.length > length.length){
+                        minLength = length;
+                    }
+                }
+               // console.log("min path");
+               /// console.log(minLength);
+                return minLength;
+            };
+            let path;
+            while(io.bots[id].player.distance > 0){
+                path = searchNear(getObjects(id),io.bots[id].player.x,io.bots[id].player.y);
+                path.splice(0,1);
+               // console.log("First");
+               // console.log(path);
+               // console.log(io.bots[id].player);
+                if (io.bots[id].player.distance<(path.length)){
+                  //  console.log("Cut");
+                  //  console.log(io.bots[id].player.distance);
+                  //  console.log(path.length);
+
+                   /// console.log(path);
+                   // console.log("-----------------------");
+                    path = path.slice(0,io.bots[id].player.distance);
+                  //  console.log(path);
+                }
+               // console.log("Second");
+               // console.log(path);
+               // console.log(io.bots[id].player);
+                io.bots[id].player.x = path[path.length - 1][0];
+                io.bots[id].player.y = path[path.length - 1][1];
+                io.bots[id].player.distance -= path.length;
+                checkTheBotWay(path,id,io.bots[id].player.x,io.bots[id].player.y);
+              //  console.log("After checkTheWay");
+              //  console.log(path);
+                console.log(io.bots[id].player);
+
+            }
+            io.bots[id].player.distance = io.bots[id].player.maxDistance;
+            this.nextMove();
         },
         nextMove() {
                 this.step++;
                 this.step %= this.moveQueue.length;
-                if (this.moveQueue[this.step].indexOf('bot') !== 0){
-                    botStep(this.moveQueue[this.step]);
+                if (this.moveQueue[this.step].indexOf('bot') === 0){
+                    this.botStep(this.moveQueue[this.step]);
                 }
         },
         deletePlayer(id){
@@ -205,14 +307,14 @@ module.exports = function startServer(dir) {
                     "player": moveHandler.createNewPlayer(id)
                 }
                 bots[id] = bot;
-                //moveHandler.moveQueue.push(id)
+                moveHandler.moveQueue.push(id)
             }
 
             return bots;
         }
     };
 
-    let mapBonus;
+    let mapBonus = [];
 
     app.use(express.static(path.join(dir, "/src")));
     app.get("/", function (req, res, next) {
@@ -274,7 +376,7 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("emit_get_bonus",function () {
-            if (mapBonus<4) mapBonus = moveHandler.getBonuses(numberOfBonuses);
+            if (mapBonus.length<4) mapBonus.concat(moveHandler.getBonuses(numberOfBonuses-3));
             socket.emit("get_bonus", mapBonus);
         });
 
