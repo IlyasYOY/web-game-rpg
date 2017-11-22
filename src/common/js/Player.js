@@ -43,7 +43,7 @@ class Player extends Entity{
 }
 
 var newMaxDistance = function (player) {
-    return parseInt((player.units.warrior*(100/typesOfUnit['warrior'].speed) + player.units.magician*(100/typesOfUnit['magician'].speed))/50);
+    return parseInt((player.units.warrior*(200/typesOfUnit['warrior'].speed) + player.units.magician*(200/typesOfUnit['magician'].speed))/50);
 };
 // var rangeOfWalking = function(player,i,j){
 //   // let distance = 10;

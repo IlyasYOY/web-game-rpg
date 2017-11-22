@@ -1,5 +1,5 @@
 var Menu = {
-    menuPoints: ['Map', 'Set Map', 'Lol','ahaha'],
+    menuPoints: ['Map', 'Info', 'Quit'],
     numberOfPoint: 0
 };
 

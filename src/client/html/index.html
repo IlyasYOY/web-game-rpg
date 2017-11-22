@@ -12,6 +12,7 @@
     <script src="/client/js/Fight.js"></script>
     <script src="/client/js/FightMenu.js"></script>
     <script src="/client/js/MapsMenu.js"></script>
+    <script src="/client/js/Info.js"></script>
     <script src="/common/js/Map.js"></script>
     <script src="/common/js/Player.js"></script>
     <script src="/client/js/FindPath.js"></script>
@@ -242,6 +243,13 @@
             canvas.style.opacity = "1";
             if (whereAmI === 'Menu') {
                 menuHandler();
+            } else if(whereAmI === 'Info'){
+                getInfo(myPerson,socket.id);
+                if (keysPushed[ButtonsKeys['Esc']] === true){
+                    whereAmI = "Menu";
+                }
+            }  else if(whereAmI === 'Quit'){
+                socket.emit('quit');
             } else if (whereAmI === 'FightMenu') {
                 reloadMiniMap();
                 fightMenuHandler(myEnemy);
@@ -289,7 +297,7 @@
     //        mauseCoord.isDown = true;
     //    };
     window.onkeyup = function (event) {
-        setKeyUp(event.keyCode);
+            setKeyUp(event.keyCode);
     };
     window.onkeydown = function (event) {
         setKeyPush(event.keyCode);

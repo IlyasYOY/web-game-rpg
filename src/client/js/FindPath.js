@@ -1,4 +1,4 @@
-var findPath = function (world, pathStart, pathEnd) {
+function findPath(world, pathStart, pathEnd) {
     // shortcuts for speed
     var abs = Math.abs;
     var max = Math.max;
@@ -153,4 +153,4 @@ var findPath = function (world, pathStart, pathEnd) {
 
 } // end of findPath() function
 
-module.exports=findPath;
+module.exports.findPath = findPath;

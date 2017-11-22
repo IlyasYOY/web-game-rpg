@@ -32,7 +32,7 @@ var fightMenuHandler = function (myEnemy) {
         } else if (FightMenu.menuPoints[FightMenu.numberOfPoint] === 'Run'){
             socket.emit('run',myEnemy);
         } else if (FightMenu.menuPoints[FightMenu.numberOfPoint] === 'Unite'){
-            socket.emit('unite');
+            socket.emit('unite',myEnemy);
         }
     }
 

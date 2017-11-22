@@ -1,5 +1,49 @@
 var path = [];
 
+var printInfoAboutPlayer = function (player,name) {
+    let width = 14;
+    inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
+    inventoryContext.font="14px Georgia";
+    inventoryContext.fillStyle = '#000000';
+    if (socket.id !== name) {
+        inventoryContext.fillText(name + '.', 0, 14);
+    } else {
+        inventoryContext.fillText('You.', 0, 14);
+    }
+    width+=14;
+    inventoryContext.fillText('ENERGY:', 0, width);
+    inventoryContext.fillText(player.energy, 14*(7), width);
+    width+=14;
+    inventoryContext.fillText('UNITS:', 0, width);
+    width+=14;
+    for (let i in player.units){
+        inventoryContext.fillText(i + ':', 0, width);
+        inventoryContext.fillText(player.units[i], 14*(i.length), width);
+        width+=14;
+    }
+    inventoryContext.fillText('INVENTORY:', 0, width);
+    width+=14;
+    for (let i in player.inventory){
+        inventoryContext.fillText(player.inventory[i],0, width);
+        width+=14;
+    }
+    inventoryContext.fillText('KEYS:', 0, width);
+    width+=14;
+    for (let i in player.keys){
+        inventoryContext.fillText(player.keys[i],0, width);
+        width+=14;
+    }
+};
+
+var checkExistPerson = function (x,y,players,bots) {
+    for(let i in players){
+        if (players[i].x === x && players[i].y === y){
+            printInfoAboutPlayer(players[i],i);
+            return;
+        }
+    }
+};
+
 var printPath = function(array,startX,startY,sizeofCell,canvasContext){
     if (myPerson.distance >= array.length){
         canvasContext.strokeStyle = "#0aff00";
@@ -102,6 +146,7 @@ var cursorHandler = function (i,j) {
         if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j)) {
             canvasContext.fillStyle = '#ffffff';
             miniMapContext.fillStyle = '#ffffff';
+            checkExistPerson(i,j,players,null);
         } else {
             canvasContext.fillStyle = '#d7001d';
             miniMapContext.fillStyle = '#d7001d';
@@ -274,6 +319,10 @@ var toMap = function () {
 
     if (keysPushed[ButtonsKeys['A']] === true){
         if (camera.startX>0) --camera.startX;
+    }
+
+    if (keysPushed[ButtonsKeys['Esc']] === true){
+        whereAmI = "Menu";
     }
 
     canvasContext.clearRect(0,0,canvasWidth,canvasHeight);
