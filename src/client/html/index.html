@@ -193,6 +193,7 @@
         playersLimit = limit;
     });
     socket.on("game_stage", function (wh) {
+        console.log(wh);
         whereAmI = wh.stage;
         myEnemy = wh.from;
     });
@@ -202,13 +203,14 @@
                 whereAmI = 'Map';
             }
         } else {
-            if (whereAmI !== 'Supervisor') {
+            if (whereAmI !== 'Supervisor' && whereAmI !== 'FightWithBot') {
                 whereAmI = 'Wait';
             }
         }
     });
     socket.on("who_moves_fight", function (id) {
         whoMoves = id;
+        console.log(whoMoves);
     });
     socket.on("fight_chose_unit", function (unit) {
         clickedUnit.unit = unit;
@@ -253,6 +255,9 @@
             } else if (whereAmI === 'FightMenu') {
                 reloadMiniMap();
                 fightMenuHandler(myEnemy);
+            } else if(whereAmI === 'FightWithBot') {
+                reloadMiniMap();
+                fightWithBotHandler(myEnemy);
             } else if (whereAmI === 'Map') {
                 toMap();
             } else if (whereAmI === 'Fight') {

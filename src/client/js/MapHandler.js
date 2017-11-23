@@ -56,12 +56,28 @@ var printPath = function(array,startX,startY,sizeofCell,canvasContext){
 };
 
 var checkPlayers = function (x,y,length) {
+    console.log("check")
     for (let i in players){
+        console.log('x / y' + x  +' / ' + y);
+        console.log(players[i]);
+
         if (socket.id !== i && players[i].x === x && players[i].y === y){
-            socket.emit('do_step', {'x': x, 'y': y},length);
-            myPerson.x = x;
-            myPerson.y = y;
-            return false;
+            if (i.indexOf('bot')===-1) {
+                console.log('Person');
+                socket.emit('do_step', {'x': x, 'y': y}, length);
+                myPerson.x = x;
+                myPerson.y = y;
+                return false;
+            } else {
+                console.log('bot');
+                myEnemy = i;
+                whoMoves = socket.id;
+                whereAmI = 'FightWithBot';
+                myPerson.x = x;
+                myPerson.y = y;
+                socket.emit('start_fight_with_bot',x,y);
+                return false;
+            }
         }
     }
     return true;

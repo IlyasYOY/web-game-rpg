@@ -79,8 +79,18 @@ var doAttack = function (myEnemy) {
 
     }
 
+
     players[myEnemy].units[clickedUnit.unit] -= damage / typesOfUnit[clickedUnit.unit].health;
-    socket.emit("do_fight_step",myEnemy,players[myEnemy],myPerson.energy);
+    console.log('my attack');
+    console.log(damage);
+    console.log(clickedUnit.unit);
+    console.log(clickedSkills.skill);
+
+    if (myEnemy.indexOf('bot')===-1) {
+        socket.emit("do_fight_step", myEnemy, players[myEnemy], myPerson.energy);
+    } else {
+        socket.emit("do_fight_step_with_bot", myEnemy, players[myEnemy], myPerson.energy);
+    }
 };
 
 var isInSquare = function(i,j,sizeOfCell,x,y){
@@ -103,8 +113,11 @@ var cursorHandlerForUnits = function (myEnemy) {
             if (cursorIsInUnit(enemyUnitsCoord[i].x,enemyUnitsCoord[i].y,enemyUnitsCoord[i].width,
                     enemyUnitsCoord[i].height,mauseCoord.x,mauseCoord.y) &&
                 players[myEnemy].units[i] > 0){
-                socket.emit("emit_fight_chose_unit",i,myEnemy);
+                if (myEnemy.indexOf('bot') === -1) {
+                    socket.emit("emit_fight_chose_unit", i, myEnemy);
+                }
                 clickedUnit.unit = i;
+                console.log(clickedUnit);
                 clickedUnit.x = enemyUnitsCoord[i].x;
                 clickedUnit.y = enemyUnitsCoord[i].y;
                 clickedUnit.heightUnit = enemyUnitsCoord[i].height;
@@ -114,7 +127,8 @@ var cursorHandlerForUnits = function (myEnemy) {
         }
         mauseCoord.isDown = false;
     }
-    canvasContext.fillStroke = "#000000";
+    canvasContext.fillStyle = "#000000";
+    canvasContext.strokeStyle = "#000000";
     canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
 };
 
@@ -126,11 +140,14 @@ var cursorHandlerForSkills = function (numbOfSkills) {
                 clickedSkills.x = parseInt(j % 5);
                 clickedSkills.y = parseInt(j / 5);
                 clickedSkills.isClick = true;
-                socket.emit("emit_fight_chose_skill",clickedSkills,myEnemy);
+                if (myEnemy.indexOf('bot') === -1) {
+                    socket.emit("emit_fight_chose_skill", clickedSkills, myEnemy);
+                }
                 mauseCoord.isDown = false;
             }
         }
-    inventoryContext.fillStroke = "#000000";
+    inventoryContext.fillStyle = "#000000";
+    inventoryContext.strokeStyle = "#000000";
     inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
 };
 
@@ -286,7 +303,9 @@ var fightGameStep = function (myEnemy) {
     cursorHandlerForUnits(myEnemy);
     if (clickedSkills.isClick && clickedUnit.isClick) {
         clearChose();
-        socket.emit("emit_fight_attack_was_made",myEnemy);
+        if (myEnemy.indexOf('bot')===-1) {
+            socket.emit("emit_fight_attack_was_made", myEnemy);
+        }
         doAttack(myEnemy);
         let flag = false;
         for (let i in players[myEnemy].units)
@@ -295,7 +314,11 @@ var fightGameStep = function (myEnemy) {
                 break;
             }
         if (!flag) {
-            socket.emit("end_of_fight", myEnemy);
+            if (myEnemy.indexOf('bot') === -1) {
+                socket.emit("end_of_fight", myEnemy);
+            } else {
+                socket.emit("end_of_fight_with_bot", myEnemy);
+            }
         }
     }
 };
@@ -318,11 +341,37 @@ var fightHandler = function (myEnemy) {
         drawMyPerson();
         drawMyEnemy(myEnemy);
         drawMySkills(players[myEnemy]);
-        canvasContext.fillStroke = "#000000";
+        canvasContext.strokeStyle = "#000000";
         canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
-        inventoryContext.fillStroke = "#000000";
+        inventoryContext.strokeStyle = "#000000";
         inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
         socket.emit("emit_get_player");
         socket.emit("emit_get_players");
+    }
+};
+
+var fightWithBotHandler = function (myEnemy) {
+    if (whoMoves === socket.id) {
+        canvas.style.opacity = "1";
+        whereAmI = 'FightWithBot';
+        if (myPerson.energy > 0 && keysPushed[ButtonsKeys['Space']] !== true) {
+            fightGameStep(myEnemy);
+        }else {
+            whoMoves = myEnemy;
+            console.log('bot');
+            console.log(players[myEnemy]);
+            console.log('person');
+            console.log(myPerson);
+            socket.emit("emit_who_moves_fight_with_bot", socket.id, myEnemy);
+        }
+    } else {
+        canvas.style.opacity = "0.5";
+        canvasContext.font="20px Georgia";
+        canvasContext.fillStyle = "#000000";
+        canvasContext.fillText('Please Wait',250,300);
+        writeStat(myEnemy);
+        drawMyPerson();
+        drawMyEnemy(myEnemy);
+        drawMySkills(players[myEnemy]);
     }
 };
