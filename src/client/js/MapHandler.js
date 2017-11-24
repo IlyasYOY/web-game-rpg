@@ -337,6 +337,10 @@ var toMap = function () {
         if (camera.startX>0) --camera.startX;
     }
 
+    if (keysPushed[ButtonsKeys['Space']] === true){
+        socket.emit('next_step');
+    }
+
     if (keysPushed[ButtonsKeys['Esc']] === true){
         whereAmI = "Menu";
     }

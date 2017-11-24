@@ -142,24 +142,25 @@ module.exports = function startServer(dir) {
                 }
 
             };
+            let compareStrength = function (me,enemy){
+                let sumMe = me.player.units.warrior + me.player.units.magician;
+                let sumEnemy = enemy.player.units.warrior + enemy.player.units.magician;
+                return sumMe > sumEnemy;
+            };
             let getObjects = function (id) {
-                let compareStrength = function (me,enemy){
-                    let sumMe = me.player.units.warrior + me.player.units.magician;
-                    let sumEnemy = enemy.player.units.warrior + enemy.player.units.magician;
-                    return sumMe > sumEnemy;
-                };
-
                 let objects = [];
                 for (let i in mapBonus) {
                     objects.push(mapBonus[i]);
                 }
                 for (let i in io.bots) {
-                    if (i!==id && compareStrength(io.bots[id],io.bots[i])) {
+                    if (io.bots[i].player && i!==id && compareStrength(io.bots[id],io.bots[i])) {
+                        console.log(io.bots[i].player);
                         objects.push(io.bots[i].player);
                     }
                 }
                 for (let i in io.sockets.connected) {
                     if (io.sockets.connected[i].player && compareStrength(io.bots[id],io.sockets.connected[i])) {
+                        console.log(io.sockets.connected[i].player);
                         objects.push(io.sockets.connected[i].player);
                     }
                 }
@@ -179,13 +180,47 @@ module.exports = function startServer(dir) {
                /// console.log(minLength);
                 return minLength;
             };
+            let botFight = function (botOneId,botTwoId) {
+                    io.bots[botOneId].player.units['warrior'] -= parseInt(io.bots[botTwoId].player.units['warrior'] / 2);
+                    if (io.bots[botOneId].player.units['warrior'] < 0){
+                        io.bots[botOneId].player.units['warrior'] = 0;
+                    }
+                    io.bots[botOneId].player.units['magician'] -= parseInt(io.bots[botTwoId].player.units['magician'] / 2);
+                    if(io.bots[botOneId].player.units['magician'] < 0){
+                        io.bots[botOneId].player.units['magician'] = 0;
+                    }
+                    io.bots[botTwoId].player.units['warrior']  = parseInt(io.bots[botTwoId].player.units['warrior'] / 2);
+                    io.bots[botTwoId].player.units['magician'] = parseInt(io.bots[botTwoId].player.units['magician'] / 2);
+
+                    for (let i in io.bots[botTwoId].player.inventory) {
+                        if (io.bots[botOneId].player.inventory.indexOf(io.bots[botTwoId].player.inventory[i]) === -1) {
+                            io.bots[botOneId].player.inventory.indexOf(io.bots[botTwoId].player.inventory[i])
+                        }
+                    }
+
+                    for (let i in io.bots[botTwoId].player.keys) {
+                        io.bots[botOneId].player.keys.push(io.bots[botTwoId].player.keys[i])
+                    }
+
+                    moveHandler.deleteNPC(botTwoId);
+            };
 
             let checkPersons = function (path,botId) {
                 for (let i in path){
+                    for (let bot in io.bots){
+                        if (io.bots[bot].player && bot !== botId && io.bots[bot].player.x === path[i][0] && io.bots[bot].player.y === path[i][1]){
+                            if (compareStrength(io.bots[botId],io.bots[bot])) {
+                                botFight(botId, bot);
+                            } else {
+                                botFight(bot, botId);
+                            }
+                            return true;
+                        }
+                    }
                     for (let j in io.sockets.connected){
                         if (io.sockets.connected[j].player && io.sockets.connected[j].player.x === path[i][0] && io.sockets.connected[j].player.y === path[i][1]){
                             console.log('ENTER TO FIGHT WITH BOT')
-                            console.log(j)
+                            console.log(j);
                             io.bots[id].player.x = path[path.length - 1][0];
                             io.bots[id].player.y = path[path.length - 1][1];
                             io.sockets.connected[j].emit("who_moves_fight",j);
@@ -333,7 +368,7 @@ module.exports = function startServer(dir) {
                 let bot = {
                     "id": id,
                     "player": moveHandler.createNewPlayer(id)
-                }
+                };
                 bots[id] = bot;
                 moveHandler.moveQueue.push(id)
             }
@@ -344,7 +379,8 @@ module.exports = function startServer(dir) {
             for (let i in this.moveQueue){
                 if (this.moveQueue[i] == id){
                     this.moveQueue.splice(i,1);
-                    delete io.bots[id].player;
+                    delete io.bots[id];
+                    break
                 }
             }
             this.step++;
@@ -360,7 +396,7 @@ module.exports = function startServer(dir) {
     });
 
     io.on("connect", function (socket) {
-        let numberOfBots = 1;
+        let numberOfBots = 2;
         let numberOfBonuses = 7;
         console.log(`Socket connected: ${socket.id}`);
 
@@ -454,7 +490,7 @@ module.exports = function startServer(dir) {
                 return false;
             };
 
-            let doBotAttack = function (id,idBot) {
+            let doSimpleBotAttack = function (id,idBot) {
                 console.log('do bot attck');
                 console.log('bot');
                 console.log(io.bots[idBot].player);
@@ -513,7 +549,7 @@ module.exports = function startServer(dir) {
 
             //console.log(io.bots[idBot].player);
             socket.emit("get_players", utils.getPlayers());
-            if (doBotAttack(id,idBot)) {
+            if (doSimpleBotAttack(id,idBot)) {
                 socket.player.energy = socket.player.maxEnergy;
                 socket.emit("get_player", socket.player);
                 socket.emit("who_moves_fight", socket.id);
@@ -702,6 +738,12 @@ module.exports = function startServer(dir) {
 
         socket.on("emit_get_player", function () {
             socket.emit("get_player", socket.player);
+        });
+
+        socket.on("next_step", function () {
+            socket.player.distance = socket.player.maxDistance;
+            moveHandler.nextMove();
+            io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
         });
 
         socket.on("do_step", function (step,rangeOfStep) {

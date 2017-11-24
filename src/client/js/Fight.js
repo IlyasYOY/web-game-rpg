@@ -81,6 +81,9 @@ var doAttack = function (myEnemy) {
 
 
     players[myEnemy].units[clickedUnit.unit] -= damage / typesOfUnit[clickedUnit.unit].health;
+    if (players[myEnemy].units[clickedUnit.unit] < 0){
+        players[myEnemy].units[clickedUnit.unit] = 0;
+    }
     console.log('my attack');
     console.log(damage);
     console.log(clickedUnit.unit);
