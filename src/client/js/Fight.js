@@ -331,6 +331,7 @@ var fightHandler = function (myEnemy) {
         canvas.style.opacity = "1";
         whereAmI = 'Fight';
         if (myPerson.energy > 0 && keysPushed[ButtonsKeys['Space']] !== true) {
+            keysPushed[ButtonsKeys['Space']] = false;
             fightGameStep(myEnemy);
         }else {
             socket.emit("emit_who_moves_fight", whoMoves, myEnemy);

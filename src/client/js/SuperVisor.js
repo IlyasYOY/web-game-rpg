@@ -22,27 +22,34 @@ var printBonusForSuperVisor = function (startX,startY,sizeOfCell,canvasContext) 
 var printCellForSuperVisor = function (i,j,startX,startY,sizeOfCell,canvasContext) {
     if (map.ourMap[i][j] === -1) {
         canvasContext.fillStyle = '#0069ff';
+        //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
+        canvasContext.fillRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     } else if (map.ourMap[i][j] === 0){
-        canvasContext.fillStyle = '#ffb33f';
+        // canvasContext.fillStyle = '#ffb33f';
+        canvasContext.drawImage(textures[0], (i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     } else if (map.ourMap[i][j] === 1){
         canvasContext.fillStyle = '#41b611';
+        //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
+        canvasContext.fillRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     } else if (map.ourMap[i][j] === 2){
         canvasContext.fillStyle = '#f0f0e7';
+        //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
+        canvasContext.fillRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     }else if (map.ourMap[i][j] === 11){
         canvasContext.fillStyle = '#000000';
+        //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
+        canvasContext.fillRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     }
     canvasContext.strokeStyle = '#000000';
     //canvasContext.strokeRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell); }
     canvasContext.strokeRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
-    //canvasContext.fillRect((i-startX)*(sizeOfCell+10),(j-startY)*(sizeOfCell+10),sizeOfCell,sizeOfCell);
-    canvasContext.fillRect((i-startX)*(sizeOfCell),(j-startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
 };
 
 var printPlayersForSuperVisor = function (startX,startY,sizeOfCell,canvasContext) {
-    console.log('lol4');
-    canvasContext.fillStyle = "#b90084";
+    //canvasContext.fillStyle = "#b90084";
     for (let i in players){
-        canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+        canvasContext.drawImage(textures[10],(players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
+        //canvasContext.fillRect((players[i].x - startX)*(sizeOfCell),(players[i].y - startY)*(sizeOfCell),sizeOfCell,sizeOfCell);
     }
 };
 

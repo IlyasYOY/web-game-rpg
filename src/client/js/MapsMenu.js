@@ -19,14 +19,17 @@ var printMapMenu = function(chainedPoint){
 
 var mapMenuHandler = function () {
     if (keysPushed[ButtonsKeys['up']] === true){
+        keysPushed[ButtonsKeys['up']] = false;
         if (MapMenu.numberOfPoint>0) --MapMenu.numberOfPoint;
     }
 
     if (keysPushed[ButtonsKeys['down']] === true){
+        keysPushed[ButtonsKeys['down']] = false;
         if ((MapMenu.numberOfPoint+1)<MapMenu.menuPoints.length) ++MapMenu.numberOfPoint;
     }
 
     if (keysPushed[ButtonsKeys['enter']] === true){
+        keysPushed[ButtonsKeys['enter']] = false;
         socket.emit("chose_map",MapMenu.menuPoints[MapMenu.numberOfPoint]);
     }
 

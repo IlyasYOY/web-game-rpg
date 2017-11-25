@@ -19,14 +19,17 @@ var printMenu = function(chainedPoint){
 
 var menuHandler = function () {
     if (keysPushed[ButtonsKeys['up']] === true){
+        keysPushed[ButtonsKeys['up']] = false;
         if (Menu.numberOfPoint>0) --Menu.numberOfPoint;
     }
 
     if (keysPushed[ButtonsKeys['down']] === true){
+        keysPushed[ButtonsKeys['down']] = false;
         if ((Menu.numberOfPoint+1)<Menu.menuPoints.length) ++Menu.numberOfPoint;
     }
 
     if (keysPushed[ButtonsKeys['enter']] === true){
+        keysPushed[ButtonsKeys['enter']] = false;
         whereAmI = Menu.menuPoints[Menu.numberOfPoint];
     }
 
