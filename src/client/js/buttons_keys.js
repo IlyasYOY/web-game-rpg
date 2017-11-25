@@ -9,7 +9,7 @@ var ButtonsKeys = {
     'A' : 65,
     'D' : 68,
     'Esc' : 27,
-    'Space' : 32
+    'Space' : 17
 };
 
 var keysPushed = {};

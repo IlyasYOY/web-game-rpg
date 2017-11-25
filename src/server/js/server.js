@@ -225,8 +225,8 @@ module.exports = function startServer(dir) {
                         if (io.sockets.connected[j].player && io.sockets.connected[j].player.x === path[i][0] && io.sockets.connected[j].player.y === path[i][1]) {
                             console.log('ENTER TO FIGHT WITH BOT')
                             console.log(j);
-                            io.bots[id].player.x = path[path.length - 1][0];
-                            io.bots[id].player.y = path[path.length - 1][1];
+                            io.bots[id].player.x = path[i][0];
+                            io.bots[id].player.y = path[i][1];
                             io.sockets.connected[j].emit("who_moves_fight", j);
                             io.sockets.connected[j].emit("game_stage", {
                                 "stage": "FightWithBot",
@@ -250,7 +250,6 @@ module.exports = function startServer(dir) {
                     path = path.slice(0, io.bots[id].player.distance);
                 }
                 if (checkPersons(path, id)) {
-                    this.nextMove();
                     return false;
                 }
                 if (path[path.length - 1]) {
@@ -267,6 +266,7 @@ module.exports = function startServer(dir) {
                 io.bots[id].player.distance = io.bots[id].player.maxDistance;
                 this.nextMove();
             }
+
         },
         nextMove() {
             let checkEndOfGame = function () {
@@ -289,8 +289,10 @@ module.exports = function startServer(dir) {
                 return false;
             };
             if (!checkEndOfGame()) {
+                do{
                 this.step++;
                 this.step %= this.moveQueue.length;
+                } while (!this.moveQueue[this.step]);
                 if (this.moveQueue[this.step].indexOf('bot') === 0) {
                     this.botStep(this.moveQueue[this.step]);
                 }
@@ -313,7 +315,7 @@ module.exports = function startServer(dir) {
             for (let i = 0; i < n; i++) {
                 let x;
                 let y;
-                let number = utils.getRandomInt(3, 9);
+                let number = utils.getRandomInt(3, 10);
                 let isOver = false;
 
                 do {
@@ -515,13 +517,12 @@ module.exports = function startServer(dir) {
             let doSimpleBotAttack = function (id, idBot) {
                 console.log('do bot attck');
                 console.log('bot');
-                console.log(io.bots[idBot].player);
                 let warPunch;
                 let magPunch;
                 let punch = -1;
                 let energy = 1;
                 let max;
-                while (io.bots[idBot].player.energy > 0) {
+                while (io.bots[idBot] && io.bots[idBot].player.energy > 0) {
                     if (socket.player) {
                         console.log('cicle');
                         punch = 0;
@@ -569,7 +570,9 @@ module.exports = function startServer(dir) {
                         io.bots[idBot].player.energy = 0;
                     }
                 }
-                io.bots[idBot].player.energy = io.bots[idBot].player.maxEnergy;
+                if (io.bots[idBot]) {
+                    io.bots[idBot].player.energy = io.bots[idBot].player.maxEnergy;
+                }
                 return true;
             };
 
@@ -640,6 +643,8 @@ module.exports = function startServer(dir) {
             io.sockets.connected[myEnemyId].emit("game_stage", {
                 "stage": "Supervisor"
             });
+            moveHandler.nextMove();
+            io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
         });
 
         socket.on('start_fight_with_bot', function (x, y) {
@@ -668,13 +673,17 @@ module.exports = function startServer(dir) {
             });
 
             moveHandler.deleteNPC(myEnemyId);
+            moveHandler.nextMove();
+            io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
         });
 
         socket.on("run", function (myEnemy) {
+            socket.player.x = io.sockets.connected[myEnemy].player.x;
+            socket.player.y = io.sockets.connected[myEnemy].player.y;
             io.sockets.connected[myEnemy].player.units['warrior'] += parseInt(socket.player.units['warrior'] / 2);
             io.sockets.connected[myEnemy].player.units['magician'] += parseInt(socket.player.units['magician'] / 2);
-            socket.player.units['warrior'] = parseInt(socket.player.units['warrior'] / 2);
-            socket.player.units['magician'] = parseInt(socket.player.units['magician'] / 2);
+            socket.player.units['warrior'] -= parseInt(socket.player.units['warrior'] / 2);
+            socket.player.units['magician'] -= parseInt(socket.player.units['magician'] / 2);
 
 
             if (isEnterable(mapHandler.currentMap, socket.player.x + 1, socket.player.y)) {
@@ -734,18 +743,21 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("unite", function (myEnemy) {
-            io.sockets.connected[myEnemy].player.units['warrior'] += socket.player.units['warrior'];
-            io.sockets.connected[myEnemy].player.units['magician'] += socket.player.units['magician'];
+            if (!socket.player) {
+                return
+            }
+                io.sockets.connected[myEnemy].player.units['warrior'] += socket.player.units['warrior'];
+                io.sockets.connected[myEnemy].player.units['magician'] += socket.player.units['magician'];
 
-            for (let i in socket.player.inventory) {
-                if (io.sockets.connected[myEnemy].player.inventory.indexOf(socket.player.inventory[i]) === -1) {
-                    io.sockets.connected[myEnemy].player.inventory.push(socket.player.inventory[i])
+                for (let i in socket.player.inventory) {
+                    if (io.sockets.connected[myEnemy].player.inventory.indexOf(socket.player.inventory[i]) === -1) {
+                        io.sockets.connected[myEnemy].player.inventory.push(socket.player.inventory[i])
+                    }
                 }
-            }
 
-            for (let i in socket.player.keys) {
-                io.sockets.connected[myEnemy].player.keys.push(socket.player.keys[i])
-            }
+                for (let i in socket.player.keys) {
+                    io.sockets.connected[myEnemy].player.keys.push(socket.player.keys[i])
+                }
 
             io.sockets.connected[myEnemy].emit("game_stage", {
                 "stage": "Wait"
@@ -815,6 +827,10 @@ module.exports = function startServer(dir) {
             socket.emit("game_stage", {
                 "stage": "Win"
             });
+        });
+
+        socket.on("emit_who_moves", function () {
+            io.emit("who_moves",moveHandler.getCurrent());
         });
 
         socket.on("start_new_game", function () {

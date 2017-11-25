@@ -231,15 +231,66 @@
         mapBonus = bonus;
     });
 
+    let img = document.createElement('img');
+    img.src = '/client/textures/map1/water.png';
     let img0 = document.createElement('img');
     img0.src = '/client/textures/map1/ground.png';
+    let img1 = document.createElement('img');
+    img1.src = '/client/textures/map1/tree.png';
+    let img2 = document.createElement('img');
+    img2.src = '/client/textures/map1/bolder.png';
+    let img3 = document.createElement('img');
+    img3.src = '/client/textures/map1/magic.png';
+    let img4 = document.createElement('img');
+    img4.src = '/client/textures/map1/distance.png';
+    let img5 = document.createElement('img');
+    img5.src = '/client/textures/map1/fireball.png';
+    let img6 = document.createElement('img');
+    img6.src = '/client/textures/map1/lightning.png';
+    let img7 = document.createElement('img');
+    img7.src = '/client/textures/map1/godpunch.png';
+    let img8 = document.createElement('img');
+    img8.src = '/client/textures/map1/warrior.png';
+    let img9 = document.createElement('img');
+    img9.src = '/client/textures/map1/magician.png';
     let img10 = document.createElement('img');
     img10.src = '/client/textures/map1/enemy.png';
     let img12 = document.createElement('img');
     img12.src = '/client/textures/map1/myPerson.png';
+    let img13 = document.createElement('img');
+    img13.src = '/client/textures/map1/positivePointer.png';
+    let img14 = document.createElement('img');
+    img14.src = '/client/textures/map1/negativePointer.png';
+    let img15 = document.createElement('img');
+    img15.src = '/client/textures/map1/punch.png';
+    let img16 = document.createElement('img');
+    img16.src = '/client/textures/map1/mag_punch.png';
+    let img17 = document.createElement('img');
+    img17.src = '/client/textures/map1/fight_fon.png';
+    let img18 = document.createElement('img');
+    img18.src = '/client/textures/map1/door.png';
+    let img19 = document.createElement('img');
+    img19.src = '/client/textures/map1/open_door.png';
+    textures[-1] = img;
     textures[0] = img0;
+    textures[1] = img1;
+    textures[2] = img2;
+    textures[3] = img3;
+    textures[4] = img4;
+    textures[5] = img5;
+    textures[6] = img6;
+    textures[7] = img7;
+    textures[8] = img8;
+    textures[9] = img9;
     textures[10] = img10;
     textures[12] = img12;
+    textures[13] = img13;
+    textures[14] = img14;
+    textures[15] = img15;
+    textures[16] = img16;
+    textures[17] = img17;
+    textures[18] = img18;
+    textures[19] = img19;
     console.log(img0);
 
     setInterval(function () {
@@ -252,7 +303,7 @@
             drawMySkills(myPerson);
             reloadMainMap();
             canvasContext.font = "20px Georgia";
-            canvasContext.fillStyle = "#000000";
+            canvasContext.fillStyle = "#ffffff";
             canvasContext.fillText('Please Wait', 250, 300);
             reloadMiniMap();
         } else {
@@ -283,7 +334,7 @@
                     socket.emit("start_new_game");
                     setTimeout(function () {
                         window.location.reload();
-                    },1500);
+                    },500);
                 },1000);
 
             } else if(whereAmI === 'Info'){

@@ -130,8 +130,7 @@ var cursorHandlerForUnits = function (myEnemy) {
         }
         mauseCoord.isDown = false;
     }
-    canvasContext.fillStyle = "#000000";
-    canvasContext.strokeStyle = "#000000";
+    canvasContext.strokeStyle = "#ffffff";
     canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
 };
 
@@ -149,60 +148,61 @@ var cursorHandlerForSkills = function (numbOfSkills) {
                 mauseCoord.isDown = false;
             }
         }
-    inventoryContext.fillStyle = "#000000";
-    inventoryContext.strokeStyle = "#000000";
+    inventoryContext.strokeStyle = "#ff0200";
     inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
 };
 
 var drawWarrior = function(positionX,positionY,number){
     canvasContext.font="14px Georgia";
-    canvasContext.fillStyle = '#000000';
+    canvasContext.fillStyle = '#ffffff';
     canvasContext.fillText(parseInt(number), 0 + positionX, 5 + positionY);
+    canvasContext.drawImage(textures[8],positionX, positionY,75,100);
     //head
-    canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(25 + positionX,5 + positionY,25,25);
-    //body
-    canvasContext.fillStyle = '#ff2b23';
-    canvasContext.fillRect(12.5 + positionX,30 + positionY,50,50);
-    //left arm
-    canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(0 + positionX,30 + positionY,12.5,25);
-    //right arm
-    canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(62.5 + positionX,30 + positionY,12.5,25);
-    //left foot
-    canvasContext.fillStyle = '#0f0aff';
-    canvasContext.fillRect(15 + positionX,80 + positionY,12.5,25);
-    //right foot
-    canvasContext.fillStyle = '#0f0aff';
-    canvasContext.fillRect(45 + positionX,80 + positionY,12.5,25);
+    // canvasContext.fillStyle = '#ffe789';
+    // canvasContext.fillRect(25 + positionX,5 + positionY,25,25);
+    // //body
+    // canvasContext.fillStyle = '#ff2b23';
+    // canvasContext.fillRect(12.5 + positionX,30 + positionY,50,50);
+    // //left arm
+    // canvasContext.fillStyle = '#ffe789';
+    // canvasContext.fillRect(0 + positionX,30 + positionY,12.5,25);
+    // //right arm
+    // canvasContext.fillStyle = '#ffe789';
+    // canvasContext.fillRect(62.5 + positionX,30 + positionY,12.5,25);
+    // //left foot
+    // canvasContext.fillStyle = '#0f0aff';
+    // canvasContext.fillRect(15 + positionX,80 + positionY,12.5,25);
+    // //right foot
+    // canvasContext.fillStyle = '#0f0aff';
+    // canvasContext.fillRect(45 + positionX,80 + positionY,12.5,25);
 };
 
 var drawMagician = function(positionX,positionY,number){
     canvasContext.font="14px Georgia";
-    canvasContext.fillStyle = '#000000';
+    canvasContext.fillStyle = '#ffffff';
     canvasContext.fillText(parseInt(number), 0 + positionX, 5 + positionY);
-    //hat
-    canvasContext.fillStyle = '#000000';
-    canvasContext.fillRect(20 + positionX,5 + positionY,35,5);
-    canvasContext.fillRect(25 + positionX,10 + positionY,25,10);
-    //head
-    canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(25 + positionX,20 + positionY,25,25);
-    //body
-    canvasContext.fillStyle = '#1217ff';
-    canvasContext.fillRect(12.5 + positionX,30 + positionY,50,60);
-    //left arm
-    canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(0 + positionX,30 + positionY,12.5,25);
-    //right arm
-    canvasContext.fillStyle = '#ffe789';
-    canvasContext.fillRect(62.5 + positionX,30 + positionY,12.5,25);
+    canvasContext.drawImage(textures[9],positionX, positionY,75,100);
+    // //hat
+    // canvasContext.fillStyle = '#000000';
+    // canvasContext.fillRect(20 + positionX,5 + positionY,35,5);
+    // canvasContext.fillRect(25 + positionX,10 + positionY,25,10);
+    // //head
+    // canvasContext.fillStyle = '#ffe789';
+    // canvasContext.fillRect(25 + positionX,20 + positionY,25,25);
+    // //body
+    // canvasContext.fillStyle = '#1217ff';
+    // canvasContext.fillRect(12.5 + positionX,30 + positionY,50,60);
+    // //left arm
+    // canvasContext.fillStyle = '#ffe789';
+    // canvasContext.fillRect(0 + positionX,30 + positionY,12.5,25);
+    // //right arm
+    // canvasContext.fillStyle = '#ffe789';
+    // canvasContext.fillRect(62.5 + positionX,30 + positionY,12.5,25);
 };
 
 var writeStat = function (myEnemy) {
     canvasContext.font="14px Georgia";
-    canvasContext.fillStyle = '#000000';
+    canvasContext.fillStyle = '#ffffff';
     canvasContext.fillText('You : ', 0, 14);
 
     let health = 0;
@@ -258,12 +258,15 @@ var drawMySkills = function (myPerson) {
             if (i%5 === 0) ++k;
             if (key === 'warrior'){
                 skills.push(skillNames[0]);
-                inventoryContext.fillStyle = "#ff1a27";}
+                //inventoryContext.fillStyle = "#ff1a27";
+                inventoryContext.drawImage(textures[15],(i%5 * 40) % 200,k*40,40,40);
+            }
             else if(key === 'magician'){
                 skills.push(skillNames[1]);
-                inventoryContext.fillStyle = "#1d21ff";
+                //inventoryContext.fillStyle = "#1d21ff";
+                inventoryContext.drawImage(textures[16],(i%5 * 40) % 200,k*40,40,40);
             }
-            inventoryContext.fillRect((i%5 * 40) % 200,k*40,40,40);
+
             ++i;
         }
     }
@@ -272,15 +275,19 @@ var drawMySkills = function (myPerson) {
         if (i%5 === 0) ++k;
         if (myPerson.inventory[key] === skillNames[2]){
             skills.push(skillNames[2]);
-            inventoryContext.fillStyle = "#fffd14";}
+            //inventoryContext.fillStyle = "#fffd14";
+            inventoryContext.drawImage(textures[5],((i%5) * 40) % 200,k*40,40,40);
+        }
         else if(myPerson.inventory[key] === skillNames[3]){
             skills.push(skillNames[3]);
-            inventoryContext.fillStyle = "#23d6ff";
+            inventoryContext.drawImage(textures[6],((i%5) * 40) % 200,k*40,40,40);
+            //inventoryContext.fillStyle = "#23d6ff";
         } else if(myPerson.inventory[key] === skillNames[4]){
-            skills.push(skillNames[3]);
-            inventoryContext.fillStyle = "#ffd3f5";
+            skills.push(skillNames[4]);
+            inventoryContext.drawImage(textures[7],((i%5) * 40) % 200,k*40,40,40);
+            //inventoryContext.fillStyle = "#ffd3f5";
         }
-        inventoryContext.fillRect(((i%5) * 40) % 200,k*40,40,40);
+        //inventoryContext.fillRect(((i%5) * 40) % 200,k*40,40,40);
         ++i;
     }
     return i;
@@ -327,6 +334,7 @@ var fightGameStep = function (myEnemy) {
 };
 
 var fightHandler = function (myEnemy) {
+    canvasContext.drawImage(textures[17],0,0,canvasHeight,canvasWidth);
     if (whoMoves === socket.id) {
         canvas.style.opacity = "1";
         whereAmI = 'Fight';
@@ -339,15 +347,15 @@ var fightHandler = function (myEnemy) {
     } else {
         canvas.style.opacity = "0.5";
         canvasContext.font="20px Georgia";
-        canvasContext.fillStyle = "#000000";
+        canvasContext.fillStyle = "#ffffff";
         canvasContext.fillText('Please Wait',250,300);
         writeStat(myEnemy);
         drawMyPerson();
         drawMyEnemy(myEnemy);
         drawMySkills(players[myEnemy]);
-        canvasContext.strokeStyle = "#000000";
+        canvasContext.strokeStyle = "#ffffff";
         canvasContext.strokeRect(clickedUnit.x, clickedUnit.y, clickedUnit.widthUnit, clickedUnit.heightUnit);
-        inventoryContext.strokeStyle = "#000000";
+        inventoryContext.strokeStyle = "#ffffff";
         inventoryContext.strokeRect((clickedSkills.x * 40) % 200, clickedSkills.y * 40, 40, 40);
         socket.emit("emit_get_player");
         socket.emit("emit_get_players");
@@ -355,6 +363,7 @@ var fightHandler = function (myEnemy) {
 };
 
 var fightWithBotHandler = function (myEnemy) {
+    canvasContext.drawImage(textures[17],0,0,canvasHeight,canvasWidth);
     if (whoMoves === socket.id) {
         canvas.style.opacity = "1";
         whereAmI = 'FightWithBot';
@@ -371,7 +380,7 @@ var fightWithBotHandler = function (myEnemy) {
     } else {
         canvas.style.opacity = "0.5";
         canvasContext.font="20px Georgia";
-        canvasContext.fillStyle = "#000000";
+        canvasContext.fillStyle = "#ffffff";
         canvasContext.fillText('Please Wait',250,300);
         writeStat(myEnemy);
         drawMyPerson();
