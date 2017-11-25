@@ -12,7 +12,7 @@
     <script src="/client/js/Fight.js"></script>
     <script src="/client/js/FightMenu.js"></script>
     <script src="/client/js/MapsMenu.js"></script>
-    <script src="/client/js/Info.js"></script>
+    <script src="/client/js/InfoInMenu.js"></script>
     <script src="/common/js/Map.js"></script>
     <script src="/common/js/Player.js"></script>
     <script src="/client/js/FindPath.js"></script>
@@ -110,8 +110,9 @@
 
 
 <script type="text/javascript">
-    let whereAmI = 'Wait';
+    let whereAmI;
     let myEnemy = -1;
+    let textures = [];
     let canvasWidth = 600;
     let canvasHeight = 600;
     let miniMapWidth = canvasWidth / 3;
@@ -171,6 +172,7 @@
         socket.emit("message_sent", `${socket.id.slice(0, 4)} at ${timeStr}:  ${inputToChat.value}`);
         inputToChat.value = '';
     };
+
     socket.on("message_sent", function(data) {
         let newLi = document.createElement("li");
         newLi.innerText = data;
@@ -178,6 +180,7 @@
     });
     socket.on("get_player", function (player) {
         myPerson = player;
+        console.log(myPerson);
     });
     socket.on('get_players', function (mPlayers) {
         players = mPlayers;
@@ -193,6 +196,7 @@
         console.log(wh);
         whereAmI = wh.stage;
         myEnemy = wh.from;
+        console.log(whereAmI);
     });
     socket.on("who_moves", function (id) {
         if (socket.id == id) {
@@ -200,7 +204,7 @@
                 whereAmI = 'Map';
             }
         } else {
-            if (whereAmI !== 'Supervisor' && whereAmI !== 'FightWithBot') {
+            if (whereAmI !== 'Supervisor' && whereAmI !== 'FightWithBot' && whereAmI !== 'EndOfGame' && whereAmI !== 'LastEndOfGame') {
                 whereAmI = 'Wait';
             }
         }
@@ -226,7 +230,20 @@
     socket.on("get_bonus", function (bonus) {
         mapBonus = bonus;
     });
+
+    let img0 = document.createElement('img');
+    img0.src = '/client/textures/map1/ground.png';
+    let img10 = document.createElement('img');
+    img10.src = '/client/textures/map1/enemy.png';
+    let img12 = document.createElement('img');
+    img12.src = '/client/textures/map1/myPerson.png';
+    textures[0] = img0;
+    textures[10] = img10;
+    textures[12] = img12;
+    console.log(img0);
+
     setInterval(function () {
+        console.log(whereAmI);
         socket.emit("emit_get_players");
         socket.emit("emit_get_bonus");
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
@@ -242,6 +259,33 @@
             canvas.style.opacity = "1";
             if (whereAmI === 'Menu') {
                 menuHandler();
+            } else if(whereAmI === 'LastEndOfGame'){
+                canvasContext.clearRect(0,0,canvasWidth,canvasHeight);
+                inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
+                miniMapContext.clearRect(0,0,miniMapWidth,miniMapHeight);
+                canvasContext.font = "20px Georgia";
+                canvasContext.fillStyle = "#000000";
+                canvasContext.fillText('BOTS WIN!', 250, 300);
+                setTimeout(function () {
+                    setTimeout(function () {
+                        window.location.reload();
+                    },1500);
+                },1500);
+            } else if (whereAmI === 'EndOfGame'){
+                canvasContext.clearRect(0,0,canvasWidth,canvasHeight);
+                inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
+                miniMapContext.clearRect(0,0,miniMapWidth,miniMapHeight);
+                canvasContext.font = "20px Georgia";
+                canvasContext.fillStyle = "#000000";
+                canvasContext.fillText('BOTS WIN!', 250, 300);
+                setTimeout(function () {
+                    //socket.emit("start_new_game");
+                    socket.emit("start_new_game");
+                    setTimeout(function () {
+                        window.location.reload();
+                    },1500);
+                },1000);
+
             } else if(whereAmI === 'Info'){
                 getInfo(myPerson,socket.id);
                 if (keysPushed[ButtonsKeys['Esc']] === true){

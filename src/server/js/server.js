@@ -8,6 +8,7 @@ let io = require('socket.io')(http);
 let isEnterable = require('../../common/js/Map').isEnterable;
 let findPath = require('./FindPath').findPath;
 let typesOfUnit = require('../../common/js/Player').typesOfUnit;
+let so;
 
 
 let port = process.env.PORT || 8080;
@@ -96,14 +97,14 @@ module.exports = function startServer(dir) {
                 }
                 search = false;
             }
-            return new Player(x, y, 0,10,id);
+            return new Player(x, y, 0, 10, id);
         },
-        botStep(id){
-            let skillNames = ['kick','mag_kick','fireball','lightning' , 'godpunch'];
+        botStep(id) {
+            let skillNames = ['kick', 'mag_kick', 'fireball', 'lightning', 'godpunch'];
             let newMaxDistance = function (player) {
-                return parseInt((player.units.warrior*(200/typesOfUnit['warrior'].speed) + player.units.magician*(200/typesOfUnit['magician'].speed))/50);
+                return parseInt((player.units.warrior * (200 / typesOfUnit['warrior'].speed) + player.units.magician * (200 / typesOfUnit['magician'].speed)) / 50);
             };
-            let checkTheBotWay = function (path,id,x,y) {
+            let checkTheBotWay = function (path, id, x, y) {
                 let flag = false;
                 let length = 1;
                 for (let cell in path) {
@@ -142,7 +143,7 @@ module.exports = function startServer(dir) {
                 }
 
             };
-            let compareStrength = function (me,enemy){
+            let compareStrength = function (me, enemy) {
                 let sumMe = me.player.units.warrior + me.player.units.magician;
                 let sumEnemy = enemy.player.units.warrior + enemy.player.units.magician;
                 return sumMe > sumEnemy;
@@ -153,13 +154,13 @@ module.exports = function startServer(dir) {
                     objects.push(mapBonus[i]);
                 }
                 for (let i in io.bots) {
-                    if (io.bots[i].player && i!==id && compareStrength(io.bots[id],io.bots[i])) {
+                    if (io.bots[i].player && i !== id && compareStrength(io.bots[id], io.bots[i])) {
                         console.log(io.bots[i].player);
                         objects.push(io.bots[i].player);
                     }
                 }
                 for (let i in io.sockets.connected) {
-                    if (io.sockets.connected[i].player && compareStrength(io.bots[id],io.sockets.connected[i])) {
+                    if (io.sockets.connected[i].player && compareStrength(io.bots[id], io.sockets.connected[i])) {
                         console.log(io.sockets.connected[i].player);
                         objects.push(io.sockets.connected[i].player);
                     }
@@ -167,49 +168,52 @@ module.exports = function startServer(dir) {
                 return objects;
             };
 
-            let searchNear = function (objects,botX,botY) {
+            let searchNear = function (objects, botX, botY) {
+                let minLength;
                 let length;
-                let minLength = findPath(mapHandler.currentMap, [botX,botY] ,[objects[0].x,objects[0].y]);
-                for (let i in objects){
-                    length = findPath(mapHandler.currentMap, [botX,botY] ,[objects[i].x,objects[i].y]);
-                    if(minLength.length > length.length){
+                console.log("yes");
+                minLength = findPath(mapHandler.currentMap, [botX, botY], [objects[0].x, objects[0].y]);
+                for (let i in objects) {
+                    length = findPath(mapHandler.currentMap, [botX, botY], [objects[i].x, objects[i].y]);
+                    if (minLength.length > length.length) {
                         minLength = length;
                     }
                 }
-               // console.log("min path");
-               /// console.log(minLength);
+                // console.log("min path");
+                /// console.log(minLength);
                 return minLength;
             };
-            let botFight = function (botOneId,botTwoId) {
-                    io.bots[botOneId].player.units['warrior'] -= parseInt(io.bots[botTwoId].player.units['warrior'] / 2);
-                    if (io.bots[botOneId].player.units['warrior'] < 0){
-                        io.bots[botOneId].player.units['warrior'] = 0;
-                    }
-                    io.bots[botOneId].player.units['magician'] -= parseInt(io.bots[botTwoId].player.units['magician'] / 2);
-                    if(io.bots[botOneId].player.units['magician'] < 0){
-                        io.bots[botOneId].player.units['magician'] = 0;
-                    }
-                    io.bots[botTwoId].player.units['warrior']  = parseInt(io.bots[botTwoId].player.units['warrior'] / 2);
-                    io.bots[botTwoId].player.units['magician'] = parseInt(io.bots[botTwoId].player.units['magician'] / 2);
+            let botFight = function (botOneId, botTwoId) {
+                io.bots[botOneId].player.units['warrior'] -= parseInt(io.bots[botTwoId].player.units['warrior'] / 2);
+                if (io.bots[botOneId].player.units['warrior'] < 0) {
+                    io.bots[botOneId].player.units['warrior'] = 0;
+                }
+                io.bots[botOneId].player.units['magician'] -= parseInt(io.bots[botTwoId].player.units['magician'] / 2);
+                if (io.bots[botOneId].player.units['magician'] < 0) {
+                    io.bots[botOneId].player.units['magician'] = 0;
+                }
+                io.bots[botTwoId].player.units['warrior'] = parseInt(io.bots[botTwoId].player.units['warrior'] / 2);
+                io.bots[botTwoId].player.units['magician'] = parseInt(io.bots[botTwoId].player.units['magician'] / 2);
 
-                    for (let i in io.bots[botTwoId].player.inventory) {
-                        if (io.bots[botOneId].player.inventory.indexOf(io.bots[botTwoId].player.inventory[i]) === -1) {
-                            io.bots[botOneId].player.inventory.indexOf(io.bots[botTwoId].player.inventory[i])
-                        }
+                for (let i in io.bots[botTwoId].player.inventory) {
+                    if (io.bots[botOneId].player.inventory.indexOf(io.bots[botTwoId].player.inventory[i]) === -1) {
+                        io.bots[botOneId].player.inventory.indexOf(io.bots[botTwoId].player.inventory[i])
                     }
+                }
 
-                    for (let i in io.bots[botTwoId].player.keys) {
-                        io.bots[botOneId].player.keys.push(io.bots[botTwoId].player.keys[i])
-                    }
+                for (let i in io.bots[botTwoId].player.keys) {
+                    io.bots[botOneId].player.keys.push(io.bots[botTwoId].player.keys[i])
+                }
 
-                    moveHandler.deleteNPC(botTwoId);
+                moveHandler.deleteNPC(botTwoId);
             };
 
-            let checkPersons = function (path,botId) {
-                for (let i in path){
-                    for (let bot in io.bots){
-                        if (io.bots[bot].player && bot !== botId && io.bots[bot].player.x === path[i][0] && io.bots[bot].player.y === path[i][1]){
-                            if (compareStrength(io.bots[botId],io.bots[bot])) {
+            let checkPersons = function (path, botId) {
+                for (let i in path) {
+                    for (let bot in io.bots) {
+                        if (io.bots[bot].player && bot !== botId && io.bots[bot].player.x === path[i][0] && io.bots[bot].player.y === path[i][1]) {
+                            console.log('ENTER TO FIGHT BOT WITH BOT')
+                            if (compareStrength(io.bots[botId], io.bots[bot])) {
                                 botFight(botId, bot);
                             } else {
                                 botFight(bot, botId);
@@ -217,13 +221,13 @@ module.exports = function startServer(dir) {
                             return true;
                         }
                     }
-                    for (let j in io.sockets.connected){
-                        if (io.sockets.connected[j].player && io.sockets.connected[j].player.x === path[i][0] && io.sockets.connected[j].player.y === path[i][1]){
+                    for (let j in io.sockets.connected) {
+                        if (io.sockets.connected[j].player && io.sockets.connected[j].player.x === path[i][0] && io.sockets.connected[j].player.y === path[i][1]) {
                             console.log('ENTER TO FIGHT WITH BOT')
                             console.log(j);
                             io.bots[id].player.x = path[path.length - 1][0];
                             io.bots[id].player.y = path[path.length - 1][1];
-                            io.sockets.connected[j].emit("who_moves_fight",j);
+                            io.sockets.connected[j].emit("who_moves_fight", j);
                             io.sockets.connected[j].emit("game_stage", {
                                 "stage": "FightWithBot",
                                 "from": botId
@@ -237,55 +241,65 @@ module.exports = function startServer(dir) {
             };
             let flag = true;
             let path;
-            while(io.bots[id].player.distance > 0){
-                path = searchNear(getObjects(id),io.bots[id].player.x,io.bots[id].player.y);
-                path.splice(0,1);
-               // console.log("First");
-               // console.log(path);
-               // console.log(io.bots[id].player);
-                if (io.bots[id].player.distance<(path.length)){
-                  //  console.log("Cut");
-                  //  console.log(io.bots[id].player.distance);
-                  //  console.log(path.length);
-
-                   /// console.log(path);
-                   // console.log("-----------------------");
-                    path = path.slice(0,io.bots[id].player.distance);
-                  //  console.log(path);
+            io.bots[id].player.distance = io.bots[id].player.maxDistance;
+            while (io.bots[id].player.distance > 0) {
+                console.log(io.bots[id].player);
+                path = searchNear(getObjects(id), io.bots[id].player.x, io.bots[id].player.y);
+                path.splice(0, 1);
+                if (io.bots[id].player.distance < (path.length)) {
+                    path = path.slice(0, io.bots[id].player.distance);
                 }
-
-                if (checkPersons(path,id)){
-                    flag = false;
-                    break;
+                if (checkPersons(path, id)) {
+                    this.nextMove();
+                    return false;
                 }
-               // console.log("Second");
-               // console.log(path);
-               // console.log(io.bots[id].player);
-                io.bots[id].player.x = path[path.length - 1][0];
-                io.bots[id].player.y = path[path.length - 1][1];
-                io.bots[id].player.distance -= path.length;
-                checkTheBotWay(path,id,io.bots[id].player.x,io.bots[id].player.y);
-              //  console.log("After checkTheWay");
-              //  console.log(path);
-              //   console.log(io.bots[id].player);
-
+                if (path[path.length - 1]) {
+                    console.log(path);
+                    io.bots[id].player.x = path[path.length - 1][0];
+                    io.bots[id].player.y = path[path.length - 1][1];
+                    io.bots[id].player.distance -= path.length;
+                    checkTheBotWay(path, id, io.bots[id].player.x, io.bots[id].player.y);
+                } else {
+                    io.bots[id].player.distance = 0;
+                }
             }
-            if(flag) {
+            if (flag) {
                 io.bots[id].player.distance = io.bots[id].player.maxDistance;
                 this.nextMove();
             }
         },
         nextMove() {
+            let checkEndOfGame = function () {
+                let flag = true;
+                for (let i in io.sockets.connected) {
+                    if (io.sockets.connected[i].player) {
+                        flag = false;
+                        break;
+                    }
+                }
+                if (flag) {
+                    so.emit("game_stage", {
+                        "stage": "EndOfGame"
+                    });
+                    so.broadcast.emit("game_stage", {
+                        "stage": "LastEndOfGame"
+                    });
+                    return true;
+                }
+                return false;
+            };
+            if (!checkEndOfGame()) {
                 this.step++;
                 this.step %= this.moveQueue.length;
-                if (this.moveQueue[this.step].indexOf('bot') === 0){
+                if (this.moveQueue[this.step].indexOf('bot') === 0) {
                     this.botStep(this.moveQueue[this.step]);
                 }
+            }
         },
-        deletePlayer(id){
-            for (let i in this.moveQueue){
-                if (this.moveQueue[i] == id){
-                    this.moveQueue.splice(i,1);
+        deletePlayer(id) {
+            for (let i in this.moveQueue) {
+                if (this.moveQueue[i] == id) {
+                    this.moveQueue.splice(i, 1);
                     delete io.sockets.connected[id].player;
                 }
             }
@@ -300,17 +314,17 @@ module.exports = function startServer(dir) {
                 let x;
                 let y;
                 let number = utils.getRandomInt(3, 9);
-                let isOver = false;                
+                let isOver = false;
 
                 do {
                     y = utils.getRandomInt(0, mapHandler.currentMap.numberOfCell);
                     x = utils.getRandomInt(0, mapHandler.currentMap.numberOfCell);
                     isOver = false;
 
-                     if (mapHandler.currentMap.ourMap[x][y] !== 0){
-                         isOver = true;
-                         continue;
-                     }
+                    if (mapHandler.currentMap.ourMap[x][y] !== 0) {
+                        isOver = true;
+                        continue;
+                    }
 
                     for (let id of ids) {
                         if (id.indexOf('bot') == 0) {
@@ -335,7 +349,7 @@ module.exports = function startServer(dir) {
                                 isOver = true;
                                 break;
                             }
-                        } 
+                        }
                     }
 
                     if (isOver) {
@@ -350,7 +364,7 @@ module.exports = function startServer(dir) {
                     }
 
                 } while (isOver);
-                
+
                 bonuses.push({
                     "numb": number,
                     "x": x,
@@ -375,10 +389,10 @@ module.exports = function startServer(dir) {
 
             return bots;
         },
-        deleteNPC(id){
-            for (let i in this.moveQueue){
-                if (this.moveQueue[i] == id){
-                    this.moveQueue.splice(i,1);
+        deleteNPC(id) {
+            for (let i in this.moveQueue) {
+                if (this.moveQueue[i] == id) {
+                    this.moveQueue.splice(i, 1);
                     delete io.bots[id];
                     break
                 }
@@ -387,6 +401,7 @@ module.exports = function startServer(dir) {
             this.step %= this.moveQueue.length;
         }
     };
+
 
     let mapBonus = [];
 
@@ -399,21 +414,24 @@ module.exports = function startServer(dir) {
         let numberOfBots = 2;
         let numberOfBonuses = 7;
         console.log(`Socket connected: ${socket.id}`);
+        so = socket;
 
-        socket.on("message_sent", function(data) {
+        socket.on("message_sent", function (data) {
             io.emit("message_sent", data);
         });
 
         if (moveHandler.moveQueue.length < utils.playersLimit) {
-            console.log("This is new player.");
             socket.player = moveHandler.createNewPlayer(socket.id);
             moveHandler.moveQueue.push(socket.id);
+            console.log(utils.playersLimit);
+            console.log(moveHandler.moveQueue);
+            console.log("This is new player.");
             socket.emit("game_stage", {
                 "stage": "Wait"
             });
             if (moveHandler.moveQueue.length === utils.playersLimit) {
                 io.bots = moveHandler.getNPCs(numberOfBots);
-                mapBonus = moveHandler.getBonuses(numberOfBonuses);                
+                mapBonus = moveHandler.getBonuses(numberOfBonuses);
                 io.emit("who_moves", moveHandler.getCurrent());
             }
         } else {
@@ -422,40 +440,42 @@ module.exports = function startServer(dir) {
                 "stage": "Supervisor"
             });
         }
+
         socket.emit("get_player", socket.player);
         socket.on("emit_get_map", function (data) {
             mapHandler.loadCurrentMap(socket);
         });
 
-        socket.emit("get_players_limit",utils.playersLimit);
+        socket.emit("get_players_limit", utils.playersLimit);
 
         socket.on("emit_get_players", function () {
             socket.emit("get_players", utils.getPlayers());
         });
 
-        socket.on("emit_who_moves_fight", function (who_moves_id,id_enemy) {
+        socket.on("emit_who_moves_fight", function (who_moves_id, id_enemy) {
             socket.player.energy = socket.player.maxEnergy;
             socket.emit("get_players", utils.getPlayers());
             socket.emit("get_player", socket.player);
             io.sockets.connected[id_enemy].emit("get_players", utils.getPlayers());
             io.sockets.connected[id_enemy].emit("get_player", io.sockets.connected[id_enemy].player);
 
-            if (socket.id === who_moves_id){
-                socket.emit("who_moves_fight",id_enemy);
-                io.sockets.connected[id_enemy].emit("who_moves_fight",id_enemy);
+            if (socket.id === who_moves_id) {
+                socket.emit("who_moves_fight", id_enemy);
+                io.sockets.connected[id_enemy].emit("who_moves_fight", id_enemy);
             } else {
-                io.sockets.connected[id_enemy].emit("who_moves_fight",socket.id);
-                socket.emit("who_moves_fight",socket.id);
+                io.sockets.connected[id_enemy].emit("who_moves_fight", socket.id);
+                socket.emit("who_moves_fight", socket.id);
             }
         });
 
         socket.on("emit_who_moves_fight_with_bot", function (id, idBot) {
             let allSkills = {
-                'fireball' : [200, 3],
-                'lightning' : [300, 4],
-                'kick' : [20, 1],
-                'godpunch' : [1000, 15],
-                'mag_kick' : [25, 2]};
+                'fireball': [200, 3],
+                'lightning': [300, 4],
+                'kick': [20, 1],
+                'godpunch': [1000, 15],
+                'mag_kick': [25, 2]
+            };
 
             let checkEnd = function (myEnemyId) {
                 console.log('check_end');
@@ -466,8 +486,8 @@ module.exports = function startServer(dir) {
                         break;
                     }
                 if (!flag) {
-                    for (let i in socket.player.inventory){
-                        if (io.bots[myEnemyId].player.inventory.indexOf(socket.player.inventory[i])=== -1) {
+                    for (let i in socket.player.inventory) {
+                        if (io.bots[myEnemyId].player.inventory.indexOf(socket.player.inventory[i]) === -1) {
                             io.bots[myEnemyId].player.inventory.push(socket.player.inventory[i]);
                         }
                     }
@@ -486,11 +506,13 @@ module.exports = function startServer(dir) {
                     moveHandler.nextMove();
                     io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
                     return true;
+
                 }
+
                 return false;
             };
 
-            let doSimpleBotAttack = function (id,idBot) {
+            let doSimpleBotAttack = function (id, idBot) {
                 console.log('do bot attck');
                 console.log('bot');
                 console.log(io.bots[idBot].player);
@@ -500,47 +522,51 @@ module.exports = function startServer(dir) {
                 let energy = 1;
                 let max;
                 while (io.bots[idBot].player.energy > 0) {
-                    console.log('cicle');
-                    punch = 0;
-                    energy = 1;
-                    max = io.bots[idBot].player.units.warrior * typesOfUnit.warrior.power;
-                    if (io.bots[idBot].player.energy >= 2) {
-                        punch = io.bots[idBot].player.units.magician * typesOfUnit.magician.power;
-                        if (max < punch) {
-                            max = punch;
-                            energy = 2;
-                        }
-                    }
-                    console.log('one');
-                    console.log(max);
-                    for (let i of io.bots[idBot].player.inventory) {
-                        if (io.bots[idBot].player.energy >= allSkills[i][1]) {
-                            punch = allSkills[i][0];
+                    if (socket.player) {
+                        console.log('cicle');
+                        punch = 0;
+                        energy = 1;
+                        max = io.bots[idBot].player.units.warrior * typesOfUnit.warrior.power;
+                        if (io.bots[idBot].player.energy >= 2) {
+                            punch = io.bots[idBot].player.units.magician * typesOfUnit.magician.power;
                             if (max < punch) {
                                 max = punch;
-                                energy = allSkills[i][1];
+                                energy = 2;
                             }
                         }
-                    }
-                    console.log("punch");
-                    console.log(max);
-                    if (max > 0) {
-                        warPunch = socket.player.units.warrior * typesOfUnit.warrior.power;
-                        magPunch = socket.player.units.magician * typesOfUnit.magician.power;
-                        if (warPunch > magPunch) {
-                            console.log('war');
-                            socket.player.units.warrior -= max / typesOfUnit.warrior.health;
-                        } else {
-                            console.log('mag');
-                            socket.player.units.magician -= max / typesOfUnit.magician.health;
+                        console.log('one');
+                        console.log(max);
+                        for (let i of io.bots[idBot].player.inventory) {
+                            if (io.bots[idBot].player.energy >= allSkills[i][1]) {
+                                punch = allSkills[i][0];
+                                if (max < punch) {
+                                    max = punch;
+                                    energy = allSkills[i][1];
+                                }
+                            }
                         }
-                        io.bots[idBot].player.energy -= energy;
-                    } else {
-                        break;
-                    }
+                        console.log("punch");
+                        console.log(max);
+                        if (max > 0) {
+                            warPunch = socket.player.units.warrior * typesOfUnit.warrior.power;
+                            magPunch = socket.player.units.magician * typesOfUnit.magician.power;
+                            if (warPunch > magPunch) {
+                                console.log('war');
+                                socket.player.units.warrior -= max / typesOfUnit.warrior.health;
+                            } else {
+                                console.log('mag');
+                                socket.player.units.magician -= max / typesOfUnit.magician.health;
+                            }
+                            io.bots[idBot].player.energy -= energy;
+                        } else {
+                            break;
+                        }
 
-                    if(checkEnd(idBot)){
-                        return false;
+                        if (checkEnd(idBot)) {
+                            return false;
+                        }
+                    } else {
+                        io.bots[idBot].player.energy = 0;
                     }
                 }
                 io.bots[idBot].player.energy = io.bots[idBot].player.maxEnergy;
@@ -549,51 +575,52 @@ module.exports = function startServer(dir) {
 
             //console.log(io.bots[idBot].player);
             socket.emit("get_players", utils.getPlayers());
-            if (doSimpleBotAttack(id,idBot)) {
+            if (doSimpleBotAttack(id, idBot)) {
                 socket.player.energy = socket.player.maxEnergy;
                 socket.emit("get_player", socket.player);
                 socket.emit("who_moves_fight", socket.id);
             }
         });
 
-        socket.on("emit_get_bonus",function () {
-            if (mapBonus.length<4){
-                mapBonus = mapBonus.concat(moveHandler.getBonuses(numberOfBonuses-3));}
+        socket.on("emit_get_bonus", function () {
+            if (mapBonus.length < 4) {
+                mapBonus = mapBonus.concat(moveHandler.getBonuses(numberOfBonuses - 3));
+            }
             socket.emit("get_bonus", mapBonus);
         });
 
-        socket.on("bonus_changed",function (bonus) {
+        socket.on("bonus_changed", function (bonus) {
             mapBonus = bonus;
         });
 
-        socket.on("do_fight_step",function (myEnemyId,myEnemy,myEnergy) {
+        socket.on("do_fight_step", function (myEnemyId, myEnemy, myEnergy) {
             io.sockets.connected[myEnemyId].player = myEnemy;
             socket.player.energy = myEnergy;
         });
 
-        socket.on("do_fight_step_with_bot",function (myEnemyId,myEnemy,myEnergy) {
+        socket.on("do_fight_step_with_bot", function (myEnemyId, myEnemy, myEnergy) {
             io.bots[myEnemyId].player = myEnemy;
             socket.player.energy = myEnergy;
             console.log('after attack');
             console.log(io.bots[myEnemyId].player);
         });
 
-        socket.on("emit_fight_chose_unit", function(clickedUnit,myEnemy){
-            io.sockets.connected[myEnemy].emit("fight_chose_unit",clickedUnit);
+        socket.on("emit_fight_chose_unit", function (clickedUnit, myEnemy) {
+            io.sockets.connected[myEnemy].emit("fight_chose_unit", clickedUnit);
         });
 
-        socket.on("emit_fight_chose_skill",function(clickedSkills,myEnemy){
-            io.sockets.connected[myEnemy].emit("fight_chose_skill",clickedSkills);
+        socket.on("emit_fight_chose_skill", function (clickedSkills, myEnemy) {
+            io.sockets.connected[myEnemy].emit("fight_chose_skill", clickedSkills);
         });
 
-        socket.on("emit_fight_attack_was_made",function (myEnemy) {
+        socket.on("emit_fight_attack_was_made", function (myEnemy) {
             io.sockets.connected[myEnemy].emit("fight_attack_was_made");
         });
 
-        socket.on("end_of_fight",function (myEnemyId) {
+        socket.on("end_of_fight", function (myEnemyId) {
 
-            for (let i in io.sockets.connected[myEnemyId].player.inventory){
-                if (socket.player.inventory.indexOf(io.sockets.connected[myEnemyId].player.inventory[i])=== -1) {
+            for (let i in io.sockets.connected[myEnemyId].player.inventory) {
+                if (socket.player.inventory.indexOf(io.sockets.connected[myEnemyId].player.inventory[i]) === -1) {
                     socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
                 }
             }
@@ -615,15 +642,15 @@ module.exports = function startServer(dir) {
             });
         });
 
-        socket.on('start_fight_with_bot', function(x,y){
+        socket.on('start_fight_with_bot', function (x, y) {
             socket.player.x = x;
             socket.player.y = y;
         });
 
-        socket.on("end_of_fight_with_bot",function (myEnemyId) {
+        socket.on("end_of_fight_with_bot", function (myEnemyId) {
 
-            for (let i in io.bots[myEnemyId].player.inventory){
-                if (socket.player.inventory.indexOf(io.bots[myEnemyId].player.inventory[i])=== -1) {
+            for (let i in io.bots[myEnemyId].player.inventory) {
+                if (socket.player.inventory.indexOf(io.bots[myEnemyId].player.inventory[i]) === -1) {
                     socket.player.inventory.push(io.bots[myEnemyId].player.inventory[i]);
                 }
             }
@@ -636,7 +663,6 @@ module.exports = function startServer(dir) {
             socket.emit("get_player", socket.player);
 
 
-
             socket.emit("game_stage", {
                 "stage": "Map"
             });
@@ -647,17 +673,17 @@ module.exports = function startServer(dir) {
         socket.on("run", function (myEnemy) {
             io.sockets.connected[myEnemy].player.units['warrior'] += parseInt(socket.player.units['warrior'] / 2);
             io.sockets.connected[myEnemy].player.units['magician'] += parseInt(socket.player.units['magician'] / 2);
-            socket.player.units['warrior']  = parseInt(socket.player.units['warrior'] / 2);
+            socket.player.units['warrior'] = parseInt(socket.player.units['warrior'] / 2);
             socket.player.units['magician'] = parseInt(socket.player.units['magician'] / 2);
 
 
-            if (isEnterable(mapHandler.currentMap, socket.player.x+1,socket.player.y)) {
+            if (isEnterable(mapHandler.currentMap, socket.player.x + 1, socket.player.y)) {
                 socket.player.x += 1
-            } else if (isEnterable(mapHandler.currentMap, socket.player.x-1,socket.player.y)) {
+            } else if (isEnterable(mapHandler.currentMap, socket.player.x - 1, socket.player.y)) {
                 socket.player.x -= 1
-            } else if (isEnterable(mapHandler.currentMap, socket.player.x,socket.player.y + 1)) {
+            } else if (isEnterable(mapHandler.currentMap, socket.player.x, socket.player.y + 1)) {
                 socket.player.y += 1
-            } else if (isEnterable(mapHandler.currentMap, socket.player.x,socket.player.y - 1)) {
+            } else if (isEnterable(mapHandler.currentMap, socket.player.x, socket.player.y - 1)) {
                 socket.player.y -= 1
             }
 
@@ -669,10 +695,10 @@ module.exports = function startServer(dir) {
                 "stage": "Wait"
             });
 
-            socket.emit("get_player",socket.player);
-            socket.emit("get_players",utils.getPlayers());
-            io.sockets.connected[myEnemy].emit("get_player",io.sockets.connected[myEnemy].player);
-            io.sockets.connected[myEnemy].emit("get_players",utils.getPlayers());
+            socket.emit("get_player", socket.player);
+            socket.emit("get_players", utils.getPlayers());
+            io.sockets.connected[myEnemy].emit("get_player", io.sockets.connected[myEnemy].player);
+            io.sockets.connected[myEnemy].emit("get_players", utils.getPlayers());
             moveHandler.nextMove();
             io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
         });
@@ -695,7 +721,7 @@ module.exports = function startServer(dir) {
                 }
         });
         socket.on("player_get_bonus", function (playerWithBonus) {
-           socket.player  = playerWithBonus;
+            socket.player = playerWithBonus;
         });
 
         socket.on("quit", function () {
@@ -718,7 +744,7 @@ module.exports = function startServer(dir) {
             }
 
             for (let i in socket.player.keys) {
-                    io.sockets.connected[myEnemy].player.keys.push(socket.player.keys[i])
+                io.sockets.connected[myEnemy].player.keys.push(socket.player.keys[i])
             }
 
             io.sockets.connected[myEnemy].emit("game_stage", {
@@ -741,12 +767,14 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("next_step", function () {
-            socket.player.distance = socket.player.maxDistance;
-            moveHandler.nextMove();
-            io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
+            if (socket.player) {
+                socket.player.distance = socket.player.maxDistance;
+                moveHandler.nextMove();
+                io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
+            }
         });
 
-        socket.on("do_step", function (step,rangeOfStep) {
+        socket.on("do_step", function (step, rangeOfStep) {
             if (socket.player.distance >= rangeOfStep) {
                 socket.player.distance -= rangeOfStep;
                 socket.player.x = step.x;
@@ -777,16 +805,67 @@ module.exports = function startServer(dir) {
                     io.emit("who_moves", moveHandler.moveQueue[moveHandler.step]);
                 }
             }
-       });
+        });
 
-        socket.on("game_end",function () {
+        socket.on("game_end", function () {
             for (let id in io.sockets.connected)
-                    io.sockets.connected[id].emit("game_stage", {
-                        "stage": "Supervisor"
-                    });
+                io.sockets.connected[id].emit("game_stage", {
+                    "stage": "Supervisor"
+                });
             socket.emit("game_stage", {
                 "stage": "Win"
             });
+        });
+
+        socket.on("start_new_game", function () {
+            mapBonus = [];
+            moveHandler.moveQueue = [];
+            moveHandler.step = 0;
+
+            for (let i in io.bots) {
+                if (io.bots[i]) {
+                    delete io.bots[i];
+                }
+            }
+
+            // for (let i in io.sockets.connected) {
+            //     if (io.sockets.connected[i].player) {
+            //         delete io.sockets.connected[i].player;
+            //     }
+            // }
+            // for (let i in io.bots) {
+            //     if (io.bots[i]) {
+            //         delete io.bots[i];
+            //     }
+            // }
+            //
+            // mapBonus = [];
+            // moveHandler.moveQueue = [];
+            // moveHandler.step = 0;
+            //
+            // for (let i in io.sockets.connected) {
+            //     if (moveHandler.moveQueue.length < utils.playersLimit) {
+            //         console.log("This is new player.");
+            //         io.sockets.connected[i].player = moveHandler.createNewPlayer(i);
+            //         moveHandler.moveQueue.push(i);
+            //         io.sockets.connected[i].emit("get_player", io.sockets.connected[i].player);
+            //         io.sockets.connected[i].emit("get_players", utils.getPlayers());
+            //         io.sockets.connected[i].emit("game_stage", {
+            //             "stage": "Wait"
+            //         });
+            //         if (moveHandler.moveQueue.length === utils.playersLimit) {
+            //             io.bots = moveHandler.getNPCs(numberOfBots);
+            //             mapBonus = moveHandler.getBonuses(numberOfBonuses);
+            //             io.emit("who_moves", moveHandler.getCurrent());
+            //         }
+            //     } else {
+            //         console.log("This is new Supervisor.");
+            //         io.sockets.connected[i].emit("game_stage", {
+            //             "stage": "Supervisor"
+            //         });
+            //     }
+            // }
+
         });
 
         socket.on("disconnect", function () {
