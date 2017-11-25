@@ -30,8 +30,6 @@
             /* высота нашего блока */
             background: #fff;
             /* цвет фона, белый */
-            border: 1px solid black;
-            /* размер и цвет границы блока */
             overflow: auto;
             /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
         }
@@ -42,13 +40,12 @@
             /* высота нашего блока */
             background: #fff;
             /* цвет фона, белый */
-            border: 1px solid black;
-            /* размер и цвет границы блока */
         }
         input {
             width: 100%;
         }
     </style>
+    <link href="/client/css/w3.css" rel="stylesheet">
 </head>
 
 <body>
@@ -61,13 +58,11 @@
         <div style="float: none;">
             <canvas style="float: none" id="inv"></canvas>
             <div style="float: none;" id="chat">
-                <ul id="messages">
-
-                </ul>
+                <ul id="messages" class="w3-ul w3-hoverable w3-tiny" />
             </div>
             <input style="float: none;" id="inputToChat" type="text" />
             <div>
-                <input type="submit" id="send-button"/>
+                <input type="submit" id="send-button" class="w3-button w3-light-grey"/>
             </div>
         </div>
     </div>
@@ -171,7 +166,9 @@
     //        = playerTwo;
     var socket = io.connect();
     sendButton.onclick = function() {
-        socket.emit("message_sent", inputToChat.value);
+        let date = new Date();
+        let timeStr = `${date.getHours()}:${date.getMinutes()}:${date.getSeconds()}.${date.getMilliseconds()}`; 
+        socket.emit("message_sent", `${socket.id.slice(0, 4)} at ${timeStr}:  ${inputToChat.value}`);
         inputToChat.value = '';
     };
     socket.on("message_sent", function(data) {
