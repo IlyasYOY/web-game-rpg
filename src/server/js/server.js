@@ -9,6 +9,9 @@ let isEnterable = require('../../common/js/Map').isEnterable;
 let findPath = require('./FindPath').findPath;
 let typesOfUnit = require('../../common/js/Player').typesOfUnit;
 let so;
+let numberOfBots = require('./settings').numberOfBots;
+let numberOfBonuses = require('./settings').numberOfBonuses;
+
 
 
 let port = process.env.PORT || 8080;
@@ -16,7 +19,7 @@ let ip = "127.0.0.1";
 
 module.exports = function startServer(dir) {
     let utils = {
-        playersLimit: 2,
+        playersLimit: require('./settings').numberOfPlayers,
         getRandomInt(min, max) {
             return Math.floor(Math.random() * (max - min)) + min;
         },
@@ -414,8 +417,6 @@ module.exports = function startServer(dir) {
 
     io.on("connect", function (socket) {
         console.log(mapHandler.currentMapNumber);
-        let numberOfBots = 2;
-        let numberOfBonuses = 7;
         console.log(`Socket connected: ${socket.id}`);
         so = socket;
 
