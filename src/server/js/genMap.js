@@ -45,6 +45,6 @@ function getMap(size, waterC = 1/4, rockC = 1/10, treeC = 1/10) {
     }
 }
 
-console.log(getMap(30));
+console.log(getMap(28));
 
 module.exports = getMap;

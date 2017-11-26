@@ -37,7 +37,7 @@ module.exports = function startServer(dir) {
 
     let mapHandler = {
         mapNames: [],
-        currentMapNumber: 0,
+        currentMapNumber: 2,
         currentMap: null,
         getMaps() {
             this.mapNames = fs.readdirSync(path.join(dir, "/src/server/js/json"));
@@ -549,8 +549,13 @@ module.exports = function startServer(dir) {
                         console.log("punch");
                         console.log(max);
                         if (max > 0) {
-                            warPunch = socket.player.units.warrior * typesOfUnit.warrior.power;
-                            magPunch = socket.player.units.magician * typesOfUnit.magician.power;
+                            if (idBot.indexOf('medium') === -1) {
+                                warPunch = socket.player.units.warrior * typesOfUnit.warrior.power;
+                                magPunch = socket.player.units.magician * typesOfUnit.magician.power;
+                            } else {
+                                warPunch = socket.player.units.warrior * typesOfUnit.warrior.power * socket.player.energy;
+                                magPunch = socket.player.units.magician * typesOfUnit.magician.power * parseInt(socket.player.energy / 2);
+                            }
                             if (warPunch > magPunch) {
                                 console.log('war');
                                 socket.player.units.warrior -= max / typesOfUnit.warrior.health;

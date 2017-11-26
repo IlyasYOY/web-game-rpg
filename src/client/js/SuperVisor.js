@@ -67,8 +67,8 @@ var printPlayersForSuperVisor = function (startX,startY,sizeOfCell,canvasContext
 
 
 var printMapForSuperVisor = function () {
-    for (let i = camera.startX;i<map.numberOfCell;++i){
-        for (let j = camera.startY;j<map.numberOfCell;++j){
+    for (let i = camera.startX;i<(camera.startX + numbersOfCell);++i){
+        for (let j = camera.startY;j<(camera.startY + numbersOfCell);++j){
             printCellForSuperVisor(i,j,camera.startX,camera.startY,sizeOfCell,canvasContext);
             printPlayersForSuperVisor(camera.startX,camera.startY,sizeOfCell,canvasContext);
         }

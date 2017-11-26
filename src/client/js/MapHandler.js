@@ -317,8 +317,8 @@ var reloadMiniMap = function () {
 
 
 var reloadMainMap = function () {
-    for (let i = camera.startX;i<map.numberOfCell;++i){
-        for (let j = camera.startY;j<map.numberOfCell;++j){
+    for (let i = camera.startX;i<(camera.startX+numbersOfCell);++i){
+        for (let j = camera.startY;j<(camera.startY + numbersOfCell);++j){
             printCell(i,j,camera.startX,camera.startY,sizeOfCell,canvasContext);
             printPlayers(camera.startX,camera.startY,sizeOfCell,canvasContext);
 
