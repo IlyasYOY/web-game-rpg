@@ -309,9 +309,12 @@ module.exports = function startServer(dir) {
             this.step++;
             this.step %= this.moveQueue.length;
         },
-        getBonuses(n) {
+        getBonuses(n, mapBonuses) {
             let ids = moveHandler.moveQueue;
             let bonuses = [];
+            if (mapBonuses) {
+                bonuses = bonuses.concat(mapBonuses);
+            }
 
             for (let i = 0; i < n; i++) {
                 let x;
@@ -594,7 +597,7 @@ module.exports = function startServer(dir) {
 
         socket.on("emit_get_bonus", function () {
             if (mapBonus.length < 4) {
-                mapBonus = mapBonus.concat(moveHandler.getBonuses(numberOfBonuses - 3));
+                mapBonus = moveHandler.getBonuses(numberOfBonuses - 3, mapBonus);
             }
             socket.emit("get_bonus", mapBonus);
         });
