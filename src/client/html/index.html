@@ -329,8 +329,8 @@
                 setTimeout(function () {
                     setTimeout(function () {
                         window.location.reload();
-                    },1500);
-                },1500);
+                    },3500);
+                },3500);
             } else if (whereAmI === 'EndOfGame'){
                 canvasContext.clearRect(0,0,canvasWidth,canvasHeight);
                 inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
@@ -343,7 +343,7 @@
                     whereAmI = 'Supervisor';
                     setTimeout(function () {
                         window.location.reload();
-                    },1000);
+                    },3000);
             } else if(whereAmI === 'Info'){
                 getInfo(myPerson,socket.id);
                 if (keysPushed[ButtonsKeys['Esc']] === true){
