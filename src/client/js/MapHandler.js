@@ -179,21 +179,31 @@ var printBonus = function (startX,startY,sizeOfCell,canvasContext) {
 var cursorHandler = function (i,j) {
     if (isInSquare(i - camera.startX,j-camera.startY,sizeOfCell,mauseCoord.x,mauseCoord.y)) {
         if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j)) {
-            canvasContext.fillStyle = '#ffffff';
-            miniMapContext.fillStyle = '#ffffff';
+            //canvasContext.fillStyle = '#ffffff';
+            //miniMapContext.fillStyle = '#ffffff';
+            canvasContext.drawImage(textures[21],(i - camera.startX) * (sizeOfCell), (j - camera.startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
             checkExistPerson(i,j,players,null);
         } else {
-            canvasContext.fillStyle = '#d7001d';
-            miniMapContext.fillStyle = '#d7001d';
+           // canvasContext.fillStyle = '#d7001d';
+            //miniMapContext.fillStyle = '#d7001d';
+            canvasContext.drawImage(textures[20],(i - camera.startX) * (sizeOfCell), (j - camera.startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
         }
-        canvasContext.fillRect((i - camera.startX) * (sizeOfCell), (j - camera.startY) * (sizeOfCell), sizeOfCell, sizeOfCell);
+
 
 
         if (mauseCoord.x <= canvasHeight)
-            miniMapContext.fillRect(i * miniMapHeight / map.numberOfCell,
+         if (fogOfWar(myPerson, i, j) && isEnterable(map, i, j))
+        {
+            miniMapContext.drawImage(textures[21],i * miniMapHeight / map.numberOfCell,
                 j * miniMapHeight / map.numberOfCell,
                 miniMapHeight / map.numberOfCell,
                 miniMapHeight / map.numberOfCell);
+        } else {
+             miniMapContext.drawImage(textures[20],i * miniMapHeight / map.numberOfCell,
+                 j * miniMapHeight / map.numberOfCell,
+                 miniMapHeight / map.numberOfCell,
+                 miniMapHeight / map.numberOfCell);
+         }
 
         canvasContext.fillStyle = '#000000';
         if (mauseCoord.isDown === true) {

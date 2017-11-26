@@ -30,7 +30,7 @@ var mapMenuHandler = function () {
 
     if (keysPushed[ButtonsKeys['enter']] === true){
         keysPushed[ButtonsKeys['enter']] = false;
-        socket.emit("chose_map",MapMenu.menuPoints[MapMenu.numberOfPoint]);
+        socket.emit("choose_map",MapMenu.menuPoints[MapMenu.numberOfPoint]);
     }
 
     printMapMenu(MapMenu.numberOfPoint);
