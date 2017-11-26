@@ -179,8 +179,6 @@ module.exports = function startServer(dir) {
                         minLength = length;
                     }
                 }
-                // console.log("min path");
-                /// console.log(minLength);
                 return minLength;
             };
             let botFight = function (botOneId, botTwoId) {
@@ -267,7 +265,6 @@ module.exports = function startServer(dir) {
                 io.bots[id].player.distance = io.bots[id].player.maxDistance;
                 this.nextMove();
             }
-
         },
         nextMove() {
             let checkEndOfGame = function () {
@@ -290,9 +287,9 @@ module.exports = function startServer(dir) {
                 return false;
             };
             if (!checkEndOfGame()) {
-                do{
-                this.step++;
-                this.step %= this.moveQueue.length;
+                do {
+                    this.step++;
+                    this.step %= this.moveQueue.length;
                 } while (!this.moveQueue[this.step]);
                 if (this.moveQueue[this.step].indexOf('bot') === 0) {
                     this.botStep(this.moveQueue[this.step]);
@@ -407,7 +404,6 @@ module.exports = function startServer(dir) {
             this.step %= this.moveQueue.length;
         }
     };
-
 
     let mapBonus = [];
 
@@ -586,7 +582,6 @@ module.exports = function startServer(dir) {
                 return true;
             };
 
-            //console.log(io.bots[idBot].player);
             socket.emit("get_players", utils.getPlayers());
             if (doSimpleBotAttack(id, idBot)) {
                 socket.player.energy = socket.player.maxEnergy;
@@ -631,7 +626,6 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("end_of_fight", function (myEnemyId) {
-
             for (let i in io.sockets.connected[myEnemyId].player.inventory) {
                 if (socket.player.inventory.indexOf(io.sockets.connected[myEnemyId].player.inventory[i]) === -1) {
                     socket.player.inventory.push(io.sockets.connected[myEnemyId].player.inventory[i]);
@@ -663,7 +657,6 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("end_of_fight_with_bot", function (myEnemyId) {
-
             for (let i in io.bots[myEnemyId].player.inventory) {
                 if (socket.player.inventory.indexOf(io.bots[myEnemyId].player.inventory[i]) === -1) {
                     socket.player.inventory.push(io.bots[myEnemyId].player.inventory[i]);
@@ -676,7 +669,6 @@ module.exports = function startServer(dir) {
 
             socket.player.energy = socket.player.maxEnergy;
             socket.emit("get_player", socket.player);
-
 
             socket.emit("game_stage", {
                 "stage": "Map"
@@ -694,7 +686,6 @@ module.exports = function startServer(dir) {
             io.sockets.connected[myEnemy].player.units['magician'] += parseInt(socket.player.units['magician'] / 2);
             socket.player.units['warrior'] -= parseInt(socket.player.units['warrior'] / 2);
             socket.player.units['magician'] -= parseInt(socket.player.units['magician'] / 2);
-
 
             if (isEnterable(mapHandler.currentMap, socket.player.x + 1, socket.player.y)) {
                 socket.player.x += 1
@@ -723,11 +714,11 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("fight", function (myEnemy) {
-
             socket.emit("game_stage", {
                 "stage": "Fight",
                 "from": myEnemy
             });
+
             for (let id of moveHandler.moveQueue)
                 if (id == myEnemy) {
                     io.sockets.connected[id].emit("game_stage", {
@@ -739,6 +730,7 @@ module.exports = function startServer(dir) {
                     break;
                 }
         });
+
         socket.on("player_get_bonus", function (playerWithBonus) {
             socket.player = playerWithBonus;
         });
@@ -756,18 +748,19 @@ module.exports = function startServer(dir) {
             if (!socket.player) {
                 return
             }
-                io.sockets.connected[myEnemy].player.units['warrior'] += socket.player.units['warrior'];
-                io.sockets.connected[myEnemy].player.units['magician'] += socket.player.units['magician'];
 
-                for (let i in socket.player.inventory) {
-                    if (io.sockets.connected[myEnemy].player.inventory.indexOf(socket.player.inventory[i]) === -1) {
-                        io.sockets.connected[myEnemy].player.inventory.push(socket.player.inventory[i])
-                    }
-                }
+            io.sockets.connected[myEnemy].player.units['warrior'] += socket.player.units['warrior'];
+            io.sockets.connected[myEnemy].player.units['magician'] += socket.player.units['magician'];
 
-                for (let i in socket.player.keys) {
-                    io.sockets.connected[myEnemy].player.keys.push(socket.player.keys[i])
+            for (let i in socket.player.inventory) {
+                if (io.sockets.connected[myEnemy].player.inventory.indexOf(socket.player.inventory[i]) === -1) {
+                    io.sockets.connected[myEnemy].player.inventory.push(socket.player.inventory[i])
                 }
+            }
+
+            for (let i in socket.player.keys) {
+                io.sockets.connected[myEnemy].player.keys.push(socket.player.keys[i])
+            }
 
             io.sockets.connected[myEnemy].emit("game_stage", {
                 "stage": "Wait"
@@ -821,6 +814,7 @@ module.exports = function startServer(dir) {
                         }
                     }
                 }
+
                 if (isCarrying && socket.player.distance === 0) {
                     socket.player.distance = socket.player.maxDistance;
                     moveHandler.nextMove();
@@ -840,18 +834,19 @@ module.exports = function startServer(dir) {
         });
 
         socket.on("emit_who_moves", function () {
-            io.emit("who_moves",moveHandler.getCurrent());
+            io.emit("who_moves", moveHandler.getCurrent());
         });
 
-        socket.on("choose_map",function (map) {
+        socket.on("choose_map", function (map) {
             console.log(map);
-            if (map === 'map1'){
+            if (map === 'map1') {
                 mapHandler.currentMapNumber = 0
             } else if (map === 'map2') {
                 mapHandler.currentMapNumber = 1;
             } else if (map === 'map3') {
                 mapHandler.currentMapNumber = 2;
             }
+
             mapHandler.currentMap = null;
             mapHandler.loadCurrentMap(io.sockets);
             mapBonus = [];
@@ -875,60 +870,15 @@ module.exports = function startServer(dir) {
             mapHandler.nextMap();
             mapHandler.loadCurrentMap(io.sockets);
 
-
             for (let i in io.bots) {
                 if (io.bots[i]) {
                     delete io.bots[i];
                 }
             }
-
-            // for (let i in io.sockets.connected) {
-            //     if (io.sockets.connected[i].player) {
-            //         delete io.sockets.connected[i].player;
-            //     }
-            // }
-            // for (let i in io.bots) {
-            //     if (io.bots[i]) {
-            //         delete io.bots[i];
-            //     }
-            // }
-            //
-            // mapBonus = [];
-            // moveHandler.moveQueue = [];
-            // moveHandler.step = 0;
-            //
-            // for (let i in io.sockets.connected) {
-            //     if (moveHandler.moveQueue.length < utils.playersLimit) {
-            //         console.log("This is new player.");
-            //         io.sockets.connected[i].player = moveHandler.createNewPlayer(i);
-            //         moveHandler.moveQueue.push(i);
-            //         io.sockets.connected[i].emit("get_player", io.sockets.connected[i].player);
-            //         io.sockets.connected[i].emit("get_players", utils.getPlayers());
-            //         io.sockets.connected[i].emit("game_stage", {
-            //             "stage": "Wait"
-            //         });
-            //         if (moveHandler.moveQueue.length === utils.playersLimit) {
-            //             io.bots = moveHandler.getNPCs(numberOfBots);
-            //             mapBonus = moveHandler.getBonuses(numberOfBonuses);
-            //             io.emit("who_moves", moveHandler.getCurrent());
-            //         }
-            //     } else {
-            //         console.log("This is new Supervisor.");
-            //         io.sockets.connected[i].emit("game_stage", {
-            //             "stage": "Supervisor"
-            //         });
-            //     }
-            // }
-
         });
 
         socket.on("disconnect", function () {
             //...
-            console.log("Client disconnected: " + socket.id);
-            if (moveHandler.moveQueue[moveHandler.step] == socket.id) {
-                moveHandler.nextMove();
-            }
-            moveHandler.moveQueue.pop(moveHandler.moveQueue.indexOf(socket.id));
         });
     });
 
