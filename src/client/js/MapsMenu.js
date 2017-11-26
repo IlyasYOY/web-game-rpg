@@ -5,7 +5,7 @@ var MapMenu = {
 
 var printMapMenu = function(chainedPoint){
     canvasContext.font="20px Georgia";
-    canvasContext.fillStyle = "#000000";
+    canvasContext.fillStyle = "#ffffff";
     var stepInMenu = canvasHeight / 30;
 
     for (var i = 0;i<MapMenu.menuPoints.length;++i){

@@ -17,19 +17,28 @@
     <script src="/common/js/Player.js"></script>
     <script src="/client/js/FindPath.js"></script>
     <style>
+        body{
+            background-image: url('/client/textures/fon.png');
+        }
         canvas {
             border: 1px solid black;
+        }
+        #mainGame {
+            margin-left: 17%;
         }
         #miniMap {
             vertical-align: top;
         }
         #chat {
+            border: 1px solid black;
             width: 200px;
             /* ширина нашего блока */
             height: 125px;
             /* высота нашего блока */
             background: #fff;
             /* цвет фона, белый */
+            opacity: 0.8;
+            font-weight: 600;
             overflow: auto;
             /* свойство для прокрутки по горизонтали. Автоматом, если больше блока */
         }
@@ -49,11 +58,11 @@
 </head>
 
 <body>
-<div align="left">
+<div id="mainGame" align="left">
     <canvas style="float: left;" id="canvas"></canvas>
 
 
-    <div style="float: left;">
+    <div  style="float: left;">
         <canvas style="float: left" id="miniMap"></canvas>
         <div style="float: none;">
             <canvas style="float: none" id="inv"></canvas>
@@ -299,7 +308,7 @@
         socket.emit("emit_get_bonus");
         canvasContext.clearRect(0, 0, canvasWidth, canvasHeight);
         if (whereAmI === 'Wait') {
-            canvas.style.opacity = "0.5";
+            canvas.style.opacity = "0.75";
             drawMySkills(myPerson);
             reloadMainMap();
             canvasContext.font = "20px Georgia";
@@ -369,14 +378,14 @@
         }
     }, 1000 / 60);
     canvas.onmousemove = function (event) {
-        mauseCoord.x = event.pageX;
+        mauseCoord.x = event.pageX - document.getElementById('canvas').offsetLeft;;
         mauseCoord.y = event.pageY;
     };
     canvas.onclick = function (event) {
         mauseCoord.isDown = true;
     };
     inventory.onmousemove = function (event) {
-        mauseCoord.x = event.pageX;
+        mauseCoord.x = event.pageX - document.getElementById('canvas').offsetLeft;
         mauseCoord.y = event.pageY;
     };
     inventory.onclick = function (event) {

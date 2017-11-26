@@ -4,7 +4,7 @@ var printInfoAboutPlayer = function (player,name) {
     let width = 14;
     inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
     inventoryContext.font="14px Georgia";
-    inventoryContext.fillStyle = '#000000';
+    inventoryContext.fillStyle = '#ffffff';
     if (socket.id !== name) {
         inventoryContext.fillText(name + '.', 0, 14);
     } else {

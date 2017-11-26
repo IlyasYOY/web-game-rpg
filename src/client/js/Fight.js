@@ -345,7 +345,7 @@ var fightHandler = function (myEnemy) {
             socket.emit("emit_who_moves_fight", whoMoves, myEnemy);
         }
     } else {
-        canvas.style.opacity = "0.5";
+        canvas.style.opacity = "0.8";
         canvasContext.font="20px Georgia";
         canvasContext.fillStyle = "#ffffff";
         canvasContext.fillText('Please Wait',250,300);
@@ -378,7 +378,7 @@ var fightWithBotHandler = function (myEnemy) {
             socket.emit("emit_who_moves_fight_with_bot", socket.id, myEnemy);
         }
     } else {
-        canvas.style.opacity = "0.5";
+        canvas.style.opacity = "0.8";
         canvasContext.font="20px Georgia";
         canvasContext.fillStyle = "#ffffff";
         canvasContext.fillText('Please Wait',250,300);

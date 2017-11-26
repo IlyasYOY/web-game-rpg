@@ -2,7 +2,7 @@ var getInfo = function (player,name) {
     let width = 14;
     canvasContext.clearRect(0,0,canvasWidth,canvasHeight);
     canvasContext.font="14px Georgia";
-    canvasContext.fillStyle = '#000000';
+    canvasContext.fillStyle = '#ffffff';
     canvasContext.fillText('Your name is ' + name, 0, 14);
     width+=28;
     canvasContext.fillText('COORD(x/y):', 0, width);
