@@ -891,6 +891,11 @@ module.exports = function startServer(dir) {
 
         socket.on("disconnect", function () {
             //...
+            console.log("Client disconnected: " + socket.id);
+            if (moveHandler.moveQueue[moveHandler.step] == socket.id) {
+                moveHandler.nextMove();
+            }
+            moveHandler.moveQueue.pop(moveHandler.moveQueue.indexOf(socket.id));
         });
     });
 
