@@ -280,6 +280,10 @@
     img18.src = '/client/textures/map1/door.png';
     let img19 = document.createElement('img');
     img19.src = '/client/textures/map1/open_door.png';
+    let img20 = document.createElement('img');
+    img20.src = '/client/textures/bad_pointer.png';
+    let img21 = document.createElement('img');
+    img21.src = '/client/textures/good_pointer.png';
     textures[-1] = img;
     textures[0] = img0;
     textures[1] = img1;
@@ -300,6 +304,8 @@
     textures[17] = img17;
     textures[18] = img18;
     textures[19] = img19;
+    textures[20] = img20;
+    textures[21] = img21;
     console.log(img0);
 
     setInterval(function () {
@@ -324,8 +330,8 @@
                 inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
                 miniMapContext.clearRect(0,0,miniMapWidth,miniMapHeight);
                 canvasContext.font = "20px Georgia";
-                canvasContext.fillStyle = "#000000";
-                canvasContext.fillText('BOTS WIN!', 250, 300);
+                canvasContext.fillStyle = "#ffffff";
+                canvasContext.fillText('END OF GAME!', 250, 300);
                 setTimeout(function () {
                     setTimeout(function () {
                         window.location.reload();
@@ -336,8 +342,8 @@
                 inventoryContext.clearRect(0,0,inventoryWidth,inventoryHeight);
                 miniMapContext.clearRect(0,0,miniMapWidth,miniMapHeight);
                 canvasContext.font = "20px Georgia";
-                canvasContext.fillStyle = "#000000";
-                canvasContext.fillText('BOTS WIN!', 250, 300);
+                canvasContext.fillStyle = "#ffffff";
+                canvasContext.fillText('END OF GAME!', 250, 300);
                     //socket.emit("start_new_game");
                     socket.emit("start_new_game");
                     whereAmI = 'Supervisor';
@@ -367,10 +373,12 @@
                 toMap();
             }else if (whereAmI === 'Win') {
                 canvasContext.font = "20px Georgia";
-                canvasContext.fillStyle = "#000000";
+                canvasContext.fillStyle = "#ffffff";
                 canvasContext.fillText('YOU WIN', 250, 300);
                 if (keysPushed[ButtonsKeys['enter']] === true){
-                    whereAmI = 'MapMenu';
+                    setTimeout(function () {
+                        whereAmI = 'MapMenu';
+                    },500);
                 }
             } else if(whereAmI === 'MapMenu'){
                 mapMenuHandler();

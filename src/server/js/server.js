@@ -218,6 +218,7 @@ module.exports = function startServer(dir) {
                             } else {
                                 botFight(bot, botId);
                             }
+                            moveHandler.nextMove();
                             return true;
                         }
                     }
@@ -386,7 +387,7 @@ module.exports = function startServer(dir) {
                     "player": moveHandler.createNewPlayer(id)
                 };
                 bots[id] = bot;
-                moveHandler.moveQueue.push(id)
+                moveHandler.moveQueue.push(id);
             }
 
             return bots;
@@ -413,6 +414,7 @@ module.exports = function startServer(dir) {
     });
 
     io.on("connect", function (socket) {
+        console.log(mapHandler.currentMapNumber);
         let numberOfBots = 2;
         let numberOfBonuses = 7;
         console.log(`Socket connected: ${socket.id}`);
@@ -836,6 +838,31 @@ module.exports = function startServer(dir) {
 
         socket.on("emit_who_moves", function () {
             io.emit("who_moves",moveHandler.getCurrent());
+        });
+
+        socket.on("choose_map",function (map) {
+            console.log(map);
+            if (map === 'map1'){
+                mapHandler.currentMapNumber = 0
+            } else if (map === 'map2') {
+                mapHandler.currentMapNumber = 1;
+            } else if (map === 'map3') {
+                mapHandler.currentMapNumber = 2;
+            }
+            mapHandler.currentMap = null;
+            mapHandler.loadCurrentMap(io.sockets);
+            mapBonus = [];
+            moveHandler.moveQueue = [];
+            moveHandler.step = 0;
+
+            for (let i in io.bots) {
+                if (io.bots[i]) {
+                    delete io.bots[i];
+                }
+            }
+            io.emit("game_stage", {
+                "stage": "LastEndOfGame"
+            });
         });
 
         socket.on("start_new_game", function () {
