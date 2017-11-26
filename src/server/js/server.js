@@ -37,7 +37,7 @@ module.exports = function startServer(dir) {
 
     let mapHandler = {
         mapNames: [],
-        currentMapNumber: 2,
+        currentMapNumber: 0,
         currentMap: null,
         getMaps() {
             this.mapNames = fs.readdirSync(path.join(dir, "/src/server/js/json"));
@@ -842,6 +842,9 @@ module.exports = function startServer(dir) {
             mapBonus = [];
             moveHandler.moveQueue = [];
             moveHandler.step = 0;
+            mapHandler.nextMap();
+            mapHandler.loadCurrentMap(io.sockets);
+
 
             for (let i in io.bots) {
                 if (io.bots[i]) {
