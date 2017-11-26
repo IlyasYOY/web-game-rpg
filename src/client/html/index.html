@@ -329,14 +329,12 @@
                 canvasContext.font = "20px Georgia";
                 canvasContext.fillStyle = "#000000";
                 canvasContext.fillText('BOTS WIN!', 250, 300);
-                setTimeout(function () {
                     //socket.emit("start_new_game");
                     socket.emit("start_new_game");
+                    whereAmI = 'Supervisor';
                     setTimeout(function () {
                         window.location.reload();
-                    },500);
-                },1000);
-
+                    },1000);
             } else if(whereAmI === 'Info'){
                 getInfo(myPerson,socket.id);
                 if (keysPushed[ButtonsKeys['Esc']] === true){
